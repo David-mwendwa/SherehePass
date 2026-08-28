@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SherehePass is dark-first and has no light mode. That is a design decision,
+   not an omission: the product is about nights out, the covers are photographs,
+   and a photograph reads better against black than against white. Everything
+   below assumes a dark canvas, so there is no `dark:` prefix anywhere in the
+   codebase. */
+
+@layer base {
+  :root {
+    --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+    --font-heading: var(--font-bricolage), var(--font-geist-sans), system-ui,
+      sans-serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+    /* The sticky header's height, in one place. The header uses it, and so does
+       every `scroll-margin` that has to clear it when an anchor is jumped to. */
+    --header-h: 4rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Keeps the page from shifting sideways when a modal locks scrolling. */
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply bg-dark-950 font-sans text-dark-100 antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading tracking-tight text-white;
+  }
+
+  /* A visible, branded focus ring everywhere, rather than the browser default
+     that vanishes against a dark background. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-dark-950;
+  }
+
+  ::selection {
+    @apply bg-primary-500/30 text-white;
+  }
+
+  [id] {
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+}
+
+@layer components {
+  /* The one surface treatment used by every card, panel and popover, so a
+     "card" looks the same wherever it appears. */
+  .surface {
+    @apply rounded-2xl border border-white/[0.07] bg-dark-900/70 backdrop-blur-xl;
+  }
+
+  .surface-hover {
+    @apply transition-all duration-300 hover:border-white/[0.14] hover:bg-dark-850/80;
+  }
+
+  /* Small uppercase label used for section eyebrows and metadata. */
+  .eyebrow {
+    @apply font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-dark-400;
+  }
+
+  /* The pink glow behind the hero and the featured card. Two blurred radial
+     blooms rather than a box-shadow, so it spills past its own bounds. */
+  .bloom {
+    @apply pointer-events-none absolute inset-0 -z-10 overflow-hidden;
+  }
+
+  .bloom::before,
+  .bloom::after {
+    content: '';
+    @apply absolute h-[38rem] w-[38rem] rounded-full blur-[120px];
+  }
+
+  .bloom::before {
+    @apply -left-40 -top-56 bg-primary-600/25;
+  }
+
+  .bloom::after {
+    @apply -right-40 top-10 bg-secondary-500/[0.09];
+  }
+
+  /* The dark scrim over an event cover, so white text on top of an arbitrary
+     photograph is always legible. Two stops rather than one: a linear fade
+     alone leaves mid-tone photographs washing out the smaller metadata. */
+  .cover-scrim {
+    background: linear-gradient(
+      to top,
+      rgb(11 11 15 / 0.95) 0%,
+      rgb(11 11 15 / 0.75) 28%,
+      rgb(11 11 15 / 0.15) 62%,
+      rgb(11 11 15 / 0.35) 100%
+    );
+  }
+
+  /* Loading placeholder. A moving highlight, not a pulsing block: it reads as
+     "arriving" rather than "broken". */
+  .skeleton {
+    @apply relative overflow-hidden bg-dark-850;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/[0.06] to-transparent;
+  }
+}
+
+@layer utilities {
+  /* Fades a horizontally scrolling row out at both ends, so a row that
+     continues past the viewport looks continuous instead of chopped. */
+  .edge-fade {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 2rem,
+      black calc(100% - 2rem),
+      transparent
+    );
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Perforated edge for the ticket stub — the notch that makes a rectangle
+     read as a ticket. */
+  .ticket-notch {
+    mask-image: radial-gradient(circle 12px at 0 50%, transparent 98%, black 100%),
+      radial-gradient(circle 12px at 100% 50%, transparent 98%, black 100%);
+    mask-composite: intersect;
+    -webkit-mask-composite: source-in;
+  }
+}
+
+/* Respect the system setting. Everything above is decorative; none of the
+   animations carry information, so they can all simply stop. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

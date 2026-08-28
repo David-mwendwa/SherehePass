@@ -1,0 +1,263 @@
+// SherehePass — ticketing for live events in Kenya.
+//
+// Why PostgreSQL, and why the shape below: selling a ticket is not a write, it
+// is a decision. "Is there one left?" and "then it is mine" have to happen as
+// one indivisible step, or two people buy the last seat in a 200-seat room and
+// somebody gets turned away at the door. Every design choice here serves that.
+//
+//   * `TicketType.sold` is a denormalised counter, updated by a conditional
+//     UPDATE (`WHERE sold + n <= quantity`). Postgres takes a row lock for the
+//     duration, so concurrent buyers serialise on it and the loser's update
+//     matches zero rows and rolls the whole order back. Counting `Ticket` rows
+//     instead would race: the count is stale the instant it is read.
+//   * A CHECK constraint (`sold <= quantity`, added in a migration) makes that
+//     invariant the database's job as well as the application's, so a future
+//     script that writes `sold` directly cannot oversell either.
+//   * Money is `Int` cents — KES stored in the smallest unit. Never Float:
+//     0.1 + 0.2 is a rounding error in a currency column.
+//   * `OrderItem.unitPriceCents` is a price snapshot. An organiser raising the
+//     price of a ticket tier must not retroactively change what an existing
+//     buyer paid.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------- accounts
+
+enum Role {
+  ATTENDEE
+  ORGANIZER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ATTENDEE)
+  avatarUrl    String?
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  organizer Organizer?
+  orders    Order[]
+  saves     SavedEvent[]
+
+  @@index([role])
+}
+
+/// An organiser is a public brand, not a person: "Blankets & Wine" rather than
+/// the account that administers it. Kept as its own row so the brand can carry
+/// a logo, a bio and a verified flag without bloating every user record.
+model Organizer {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  name      String
+  slug      String   @unique
+  bio       String?
+  logoUrl   String?
+  website   String?
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events Event[]
+}
+
+// ------------------------------------------------------------------ events
+
+enum EventCategory {
+  MUSIC
+  TECH
+  SPORTS
+  FOOD
+  ARTS
+  BUSINESS
+  FESTIVAL
+  COMMUNITY
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+/// Venues are their own rows rather than free text on the event, so "KICC" is
+/// one place with one set of coordinates however many events happen there.
+model Venue {
+  id        String  @id @default(cuid())
+  name      String
+  address   String
+  county    String
+  latitude  Float?
+  longitude Float?
+
+  events Event[]
+
+  @@unique([name, county])
+  @@index([county])
+}
+
+model Event {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  summary     String
+  description String
+  coverImage  String
+  category    EventCategory
+  status      EventStatus   @default(DRAFT)
+  startsAt    DateTime
+  endsAt      DateTime
+  publishedAt DateTime?
+  featured    Boolean       @default(false)
+  minAge      Int?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  organizerId String
+  organizer   Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  venueId     String
+  venue       Venue     @relation(fields: [venueId], references: [id])
+
+  ticketTypes TicketType[]
+  orders      Order[]
+  saves       SavedEvent[]
+  tickets     Ticket[]
+
+  // The browse page filters on status + category and sorts by start time; this
+  // is the index that query actually uses.
+  @@index([status, startsAt])
+  @@index([category, startsAt])
+  @@index([organizerId])
+}
+
+/// A tier of admission — Early Bird, Regular, VIP. `sold` is the counter that
+/// the purchase transaction increments conditionally; see the file header.
+model TicketType {
+  id             String    @id @default(cuid())
+  eventId        String
+  name           String
+  description    String?
+  priceCents     Int
+  quantity       Int
+  sold           Int       @default(0)
+  maxPerOrder    Int       @default(10)
+  salesStart     DateTime?
+  salesEnd       DateTime?
+  position       Int       @default(0)
+
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  tickets    Ticket[]
+
+  @@index([eventId])
+}
+
+model SavedEvent {
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId])
+  @@index([eventId])
+}
+
+// ------------------------------------------------------------------ orders
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MPESA
+  CARD
+}
+
+model Order {
+  id         String        @id @default(cuid())
+  reference  String        @unique
+  userId     String
+  eventId    String
+  status     OrderStatus   @default(PENDING)
+  method     PaymentMethod
+  totalCents Int
+  buyerName  String
+  buyerEmail String
+  buyerPhone String?
+  /// Gateway-side identifier — an M-Pesa CheckoutRequestID or a Stripe intent.
+  /// Nullable because the order row exists before the gateway is called.
+  gatewayRef String?
+  paidAt     DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  user   User        @relation(fields: [userId], references: [id])
+  event  Event       @relation(fields: [eventId], references: [id])
+  items  OrderItem[]
+  tickets Ticket[]
+
+  @@index([userId, createdAt])
+  @@index([eventId, status])
+}
+
+/// Price snapshot. `unitPriceCents` is copied from the ticket type at purchase
+/// and never read back from it, so repricing a tier cannot rewrite history.
+model OrderItem {
+  id             String @id @default(cuid())
+  orderId        String
+  ticketTypeId   String
+  quantity       Int
+  unitPriceCents Int
+
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+
+  @@index([orderId])
+}
+
+enum TicketStatus {
+  VALID
+  CHECKED_IN
+  VOID
+}
+
+/// One row per human admitted. This is the thing that is scanned at the door,
+/// so it is a row rather than a quantity: two people holding "2x Regular"
+/// cannot be checked in independently if the pair is a single record.
+///
+/// `code` is the QR payload and is unique, which is also what makes a replayed
+/// scan a no-op rather than a second admission.
+model Ticket {
+  id           String       @id @default(cuid())
+  code         String       @unique
+  orderId      String
+  eventId      String
+  ticketTypeId String
+  holderName   String
+  status       TicketStatus @default(VALID)
+  checkedInAt  DateTime?
+  createdAt    DateTime     @default(now())
+
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  event      Event      @relation(fields: [eventId], references: [id])
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+
+  @@index([orderId])
+  @@index([eventId, status])
+}

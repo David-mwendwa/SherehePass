@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Same mark, padded for the iOS home-screen mask, which crops to a
+       rounded square and clips anything near the edge. -->
+  <rect width="180" height="180" fill="#0B0B0F"/>
+  <g transform="translate(28 28) scale(4)">
+    <path d="M3 9a3 3 0 0 1 3-3h7v3.2a2.8 2.8 0 0 0 0 5.6v2.4a2.8 2.8 0 0 0 0 5.6V26H6a3 3 0 0 1-3-3v-3.2a3.8 3.8 0 0 0 0-7.6V9Z" fill="#FF1FA3"/>
+    <path d="M16 6h10a3 3 0 0 1 3 3v3.2a3.8 3.8 0 0 0 0 7.6V23a3 3 0 0 1-3 3H16v-3.2a2.8 2.8 0 0 0 0-5.6v-2.4a2.8 2.8 0 0 0 0-5.6V6Z" fill="#FF1FA3" opacity="0.55"/>
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
+import { AuthForm } from '@/components/auth/AuthForm';
+import { getCurrentUser } from '@/lib/auth';
+
+export const metadata = { title: 'Create an account' };
+
+export default async function SignUpPage({ searchParams }) {
+  const params = await searchParams;
+  if (await getCurrentUser()) redirect(params.next ?? '/');
+
+  return (
+    <>
+      <div className="mb-8 text-center">
+        <h1 className="font-heading text-3xl font-bold">Create an account</h1>
+        <p className="mt-2 text-sm text-dark-400">
+          Takes a moment. You need one to hold a ticket.
+        </p>
+      </div>
+
+      <AuthForm mode="signup" next={params.next} />
+
+      <p className="mt-6 text-center text-sm text-dark-400">
+        Already have an account?{' '}
+        <Link
+          href={
+            params.next
+              ? `/signin?next=${encodeURIComponent(params.next)}`
+              : '/signin'
+          }
+          className="font-medium text-primary-300 transition-colors hover:text-primary-200"
+        >
+          Sign in
+        </Link>
+      </p>
+    </>
+  );
+}
