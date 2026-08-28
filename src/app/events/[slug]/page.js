@@ -181,7 +181,7 @@ export default async function EventPage({ params }) {
                   </h3>
                   {event.organizer.verified ? (
                     <BadgeCheck
-                      className="h-4.5 w-4.5 text-primary-400"
+                      className="h-4 w-4 text-primary-400"
                       aria-label="Verified organiser"
                     />
                   ) : null}

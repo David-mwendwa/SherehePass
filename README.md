@@ -94,6 +94,7 @@ used one and a pending order — because an empty account demos as broken.
 | `npm run db:migrate` | New migration from schema changes |
 | `npm run db:studio` | Prisma Studio |
 | `npm run covers:fetch` | Re-harvest event cover photos from Unsplash |
+| `npm run check:classes` | Fail on a Tailwind class that does not exist (runs in `build`) |
 
 ---
 

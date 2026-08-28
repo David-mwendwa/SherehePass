@@ -83,7 +83,7 @@ export function TicketPicker({
     <div className="surface overflow-hidden">
       <div className="border-b border-white/[0.06] px-5 py-4">
         <h2 className="flex items-center gap-2 font-heading text-lg font-bold">
-          <Ticket className="h-4.5 w-4.5 text-primary-400" />
+          <Ticket className="h-4 w-4 text-primary-400" />
           Tickets
         </h2>
       </div>
