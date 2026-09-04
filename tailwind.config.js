@@ -5,7 +5,12 @@
 // without touching a component.
 export default {
   darkMode: ['class'],
-  content: ['./src/**/*.{js,jsx}'],
+  // Tailwind only emits a class it can find in these files. Miss an extension
+  // and the stylesheet comes out empty with no error anywhere — which is what
+  // happened when this project moved to TypeScript and this glob still said
+  // `{js,jsx}`. The build passed, the types passed, and every page rendered
+  // unstyled.
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     container: {
       center: true,

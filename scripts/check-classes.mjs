@@ -27,6 +27,9 @@ import { join, extname } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 
+/** Kept in step with the `content` globs in tailwind.config.js. */
+const SOURCE_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx'];
+
 /** Utilities whose value comes off a numeric scale, where 13 looks as real as 12. */
 const CHECKED_PREFIXES = [
   'h', 'w', 'min-h', 'min-w', 'max-h', 'max-w',
@@ -54,12 +57,26 @@ function sourceFiles(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) sourceFiles(path, out);
-    else if (['.js', '.jsx'].includes(extname(name))) out.push(path);
+    else if (SOURCE_EXTENSIONS.includes(extname(name))) out.push(path);
   }
   return out;
 }
 
 const files = sourceFiles(join(ROOT, 'src'));
+
+// A checker that finds nothing to check is indistinguishable from a passing
+// one, and that is how this script stopped working: the extension list said
+// `.js`/`.jsx`, the project moved to TypeScript, and it went on reporting
+// success over zero files. Finding no source at all is a broken checker, not a
+// clean project.
+if (files.length === 0) {
+  console.error(
+    `\n✗ no source files under src/ matching ${SOURCE_EXTENSIONS.join(', ')}\n\n` +
+      'This check cannot pass by having nothing to look at. Either the paths\n' +
+      'moved or SOURCE_EXTENSIONS is out of date.\n'
+  );
+  process.exit(1);
+}
 
 // Collect candidates with the file and line they came from, so a failure names
 // the place to fix rather than just the class.
