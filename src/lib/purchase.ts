@@ -98,6 +98,47 @@ export type PurchaseLine = {
   quantity: number;
 };
 
+export type StockClaim =
+  | { ok: true }
+  | { ok: false; remaining: number };
+
+/**
+ * Take `quantity` from a tier, or fail. The single most important statement in
+ * the codebase.
+ *
+ *     UPDATE "TicketType" SET sold = sold + n WHERE id = ? AND sold + n <= quantity
+ *
+ * The test and the write are one statement, so there is no window between them
+ * for another transaction to slip into. Postgres holds a row lock for its
+ * duration; concurrent buyers serialise, and whoever arrives after the stock is
+ * gone matches zero rows and is told so.
+ *
+ * The failure path reports `remaining` from the tier as it was read at the top
+ * of the transaction, so the number in "only 2 left" can be a moment stale.
+ * That is deliberate: it is a message, not a decision. Every decision is made
+ * by the WHERE clause.
+ *
+ * Exported so the live demonstration on /engineering can call the real thing.
+ * A demo that re-implemented this would only prove that the copy works.
+ */
+export async function claimStock(
+  tx: Prisma.TransactionClient,
+  tier: { id: string; quantity: number; sold: number },
+  quantity: number
+): Promise<StockClaim> {
+  const claimed = await tx.ticketType.updateMany({
+    where: {
+      id: tier.id,
+      sold: { lte: tier.quantity - quantity },
+    },
+    data: { sold: { increment: quantity } },
+  });
+
+  return claimed.count === 0
+    ? { ok: false, remaining: tier.quantity - tier.sold }
+    : { ok: true };
+}
+
 export type PurchaseInput = {
   /** Who is buying. Always from the session, never from the form. */
   userId: string;
@@ -205,25 +246,15 @@ export async function purchaseTickets({
     }
 
     // ---- the claim ------------------------------------------------------
-    // One conditional UPDATE per tier. `updateMany` is what makes this atomic:
-    // it compiles to an UPDATE ... WHERE, so the availability test happens
-    // inside the same statement that takes the stock. `update` with a prior
-    // read would reintroduce exactly the race this exists to close.
+    // One conditional UPDATE per tier, inside this transaction. See claimStock.
     for (const { line, tier } of resolved) {
-      const claimed = await tx.ticketType.updateMany({
-        where: {
-          id: tier.id,
-          sold: { lte: tier.quantity - line.quantity },
-        },
-        data: { sold: { increment: line.quantity } },
-      });
+      const claim = await claimStock(tx, tier, line.quantity);
 
-      if (claimed.count === 0) {
-        const remaining = tier.quantity - tier.sold;
+      if (!claim.ok) {
         throw new PurchaseError(
-          remaining <= 0
+          claim.remaining <= 0
             ? `${tier.name} has sold out.`
-            : `Only ${remaining} ${tier.name} ticket${remaining === 1 ? '' : 's'} left.`,
+            : `Only ${claim.remaining} ${tier.name} ticket${claim.remaining === 1 ? '' : 's'} left.`,
           { code: 'SOLD_OUT', tierId: tier.id }
         );
       }

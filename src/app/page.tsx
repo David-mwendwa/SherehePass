@@ -66,7 +66,7 @@ export default async function HomePage() {
               {totalUpcoming} events on sale across Kenya
             </p>
 
-            <h1 className="font-heading text-[2.75rem] font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="font-heading text-display text-white">
               Find the night.
               <br />
               <span className="text-primary-400">Keep the ticket.</span>
@@ -162,7 +162,7 @@ export default async function HomePage() {
         <div className="surface relative overflow-hidden p-8 sm:p-12">
           <div className="bloom opacity-60" />
           <div className="relative">
-            <h2 className="max-w-lg font-heading text-3xl font-bold sm:text-4xl">
+            <h2 className="max-w-lg font-heading text-title">
               Three steps, no printer.
             </h2>
             <div className="mt-10 grid gap-8 sm:grid-cols-3">
@@ -185,14 +185,24 @@ export default async function HomePage() {
                 body="Your ticket lives in your account with a QR code. It gets scanned once at the gate and cannot be used twice."
               />
             </div>
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <Button href="/events" size="lg">
                 Browse events
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button href="/sell" variant="secondary" size="lg">
                 Sell tickets
               </Button>
+              <Link
+                href="/engineering"
+                className="group ml-1 flex items-center gap-1.5 text-sm text-dark-400 transition-colors hover:text-white"
+              >
+                Why it can’t oversell
+                <ArrowRight
+                  className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </Link>
             </div>
           </div>
         </div>
@@ -220,7 +230,7 @@ function SectionHeading({
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <div className="eyebrow mb-2">{eyebrow}</div>
-        <h2 className="font-heading text-2xl font-bold sm:text-3xl">{title}</h2>
+        <h2 className="font-heading text-section">{title}</h2>
         {description ? (
           <p className="mt-2 max-w-lg text-sm text-dark-400">{description}</p>
         ) : null}

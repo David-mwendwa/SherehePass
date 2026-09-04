@@ -41,13 +41,21 @@ export function SiteFooter() {
             <FooterLink href="/organizers">Organisers</FooterLink>
             <FooterLink href="/organizer">Dashboard</FooterLink>
             <FooterLink href="/sell">Sell tickets</FooterLink>
+            <FooterLink href="/engineering">How it works inside</FooterLink>
           </FooterColumn>
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-white/[0.06] pt-6 text-xs text-dark-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} SherehePass. Built in Nairobi.</p>
           <p>
-            A portfolio project. Payments run in sandbox mode — no money moves.
+            A portfolio project — payments run in sandbox mode, no money moves.{' '}
+            <Link
+              href="/engineering"
+              className="text-dark-300 underline decoration-dark-600 underline-offset-4 transition-colors hover:text-white hover:decoration-primary-400"
+            >
+              See how it cannot oversell
+            </Link>
+            .
           </p>
         </div>
       </div>

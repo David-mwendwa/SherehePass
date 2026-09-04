@@ -168,17 +168,53 @@ async function signIn(email, password) {
   await sleep(3500);
 }
 
+/**
+ * Targets the trigger by `aria-controls`, which is part of the disclosure
+ * contract and cannot be dropped without breaking the component itself.
+ *
+ * It used to look for `aria-haspopup="menu"`. That attribute went away when the
+ * dropdown stopped claiming `role="menu"` — and because the click was written
+ * `?.click()`, sign-out silently did nothing instead of failing. Every check
+ * after this point then ran as the wrong user, and the first symptom was the
+ * organiser dashboard "not rendering". Optional chaining on a selector that is
+ * required to match turns a broken test into a lying one.
+ */
 async function signOut() {
   await goto('/');
-  await evaluate(`
-    document.querySelector('button[aria-haspopup="menu"]')?.click();
+  const opened = await evaluate(`
+    const trigger = document.querySelector('button[aria-controls="account-menu"]');
+    if (!trigger) return false;
+    trigger.click();
+    return true;
   `);
+  if (!opened) throw new Error('Account menu trigger not found — cannot sign out.');
+
   await sleep(500);
-  await evaluate(`
-    [...document.querySelectorAll('button')]
-      .find((b) => /Sign out/.test(b.textContent))?.click();
+  const submitted = await evaluate(`
+    const button = [...document.querySelectorAll('button')]
+      .find((b) => /Sign out/.test(b.textContent));
+    if (!button) return false;
+    button.click();
+    return true;
   `);
+  if (!submitted) throw new Error('Sign out button not found in the open menu.');
+
   await sleep(2500);
+}
+
+/**
+ * Polls until `body` returns truthy, rather than sleeping a fixed time and
+ * hoping. Used where the thing being waited for is a state change that races
+ * with something else on a timer.
+ */
+async function waitFor(body, { timeout = 10000, interval = 150 } = {}) {
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    const value = await evaluate(body);
+    if (value) return value;
+    if (Date.now() > deadline) return null;
+    await sleep(interval);
+  }
 }
 
 // ---------------------------------------------------------------- attendee
@@ -220,13 +256,40 @@ await evaluate(`
   ${setInput('input[name="phone"]', '0712345678')}
   [...document.querySelectorAll('button[type="submit"]')].at(-1).click();
 `);
-await sleep(4000);
 
-const orderPath = await evaluate('return location.pathname;');
-check('checking out creates an order', orderPath.startsWith('/orders/'), orderPath);
+/**
+ * Polled rather than slept, because this assertion races the thing it is
+ * checking. The payment simulator settles at 2.5s; the old fixed `sleep(4000)`
+ * meant the order had usually already flipped to paid by the time "is it
+ * pending?" was asked, and the check passed only when the machine was slow.
+ * Waiting for the redirect and reading immediately is deterministic.
+ */
+const orderPath = await waitFor(`
+  return location.pathname.startsWith('/orders/') ? location.pathname : null;
+`);
+check('checking out creates an order', Boolean(orderPath), orderPath ?? 'no redirect');
+
+/**
+ * Waits for the route's own content rather than its loading skeleton.
+ *
+ * The pathname changes the moment the redirect lands, but with a `loading.tsx`
+ * on this route what is on screen at that instant is a placeholder — so reading
+ * the body text immediately found neither "Waiting for payment" nor anything
+ * else, and by the time the real content arrived the simulator (2.5s) had
+ * already settled it. Polling for one of the three real states is what makes
+ * this deterministic instead of a race against the skeleton.
+ */
+const firstState = await waitFor(`
+  const text = document.body.innerText;
+  if (text.includes('Waiting for payment')) return 'pending';
+  if (text.includes('You\\u2019re in')) return 'paid';
+  if (text.includes('did not go through')) return 'failed';
+  return null;
+`);
 check(
   'the order starts unpaid',
-  await evaluate('return document.body.innerText.includes("Waiting for payment");')
+  firstState === 'pending',
+  firstState ?? 'no order state rendered'
 );
 
 // The payment simulator settles at 2.5s; the poller refreshes every 2s.
@@ -274,9 +337,23 @@ check(
   await evaluate('return document.body.innerText.includes("DevFest Nairobi");')
 );
 
-// The code is needed for the door checks below.
+/**
+ * The code for the door checks below, taken from a ticket that is still VALID.
+ *
+ * It used to take the first `SHRH…` in the page, which is the oldest ticket in
+ * the wallet — and after this test has been run once, that one has already been
+ * checked in. "A valid ticket is admitted" then failed against a ticket the
+ * previous run had spent, which looked like a scanner bug and was a test that
+ * only passed on a freshly seeded database.
+ */
 const code = await evaluate(`
-  const match = document.body.innerText.match(/SHRH[A-Z0-9-]+/);
+  const stub = [...document.querySelectorAll('.surface')].find(
+    (el) =>
+      /DevFest Nairobi/.test(el.innerText) &&
+      /\\bValid\\b/.test(el.innerText) &&
+      /SHRH/.test(el.innerText)
+  );
+  const match = stub?.innerText.match(/SHRH[A-Z0-9-]+/);
   return match ? match[0].replace(/-/g, '') : null;
 `);
 
@@ -291,11 +368,23 @@ check(
   await evaluate('return document.body.innerText.includes("Nairobi Devs");')
 );
 
+/**
+ * The door link for the event the ticket is actually for.
+ *
+ * It used to take the *first* door link on the dashboard, which is the
+ * organiser's soonest upcoming event — and this organiser has six. The ticket
+ * bought above is for DevFest Nairobi, so as soon as a nearer event existed the
+ * scanner was being handed a code from a different event and correctly replying
+ * "no such ticket". The seed uses fixed dates, so which event is soonest
+ * changes as real time passes: the test was quietly date-dependent.
+ */
 const eventId = await evaluate(`
-  const link = [...document.querySelectorAll('a[href*="/door"]')]
-    .map((a) => a.getAttribute('href'))
-    .find((href) => href.includes('/organizer/events/'));
-  return link ? link.split('/')[3] : null;
+  const link = [...document.querySelectorAll('a[href*="/door"]')].find((a) => {
+    const row = a.closest('tr') ?? a.closest('li') ?? a.parentElement;
+    return /DevFest Nairobi/.test(row?.innerText ?? '');
+  });
+  const href = link?.getAttribute('href');
+  return href && href.includes('/organizer/events/') ? href.split('/')[3] : null;
 `);
 
 if (code && eventId) {
@@ -330,6 +419,57 @@ if (code && eventId) {
 } else {
   check('found a ticket and event to scan', false, `code=${code} event=${eventId}`);
 }
+
+// ------------------------------------------------------------- engineering
+
+/**
+ * The live demonstration is the one page whose whole claim is that it is not a
+ * mock-up, so it is worth asserting that pressing the button really does open
+ * transactions and really does refuse to oversell. This drives it the way a
+ * visitor would.
+ */
+await goto('/engineering');
+check(
+  'the engineering page renders',
+  await evaluate(
+    'return document.body.innerText.includes("Two people, one last ticket");'
+  )
+);
+
+await evaluate(`
+  const attempts = document.querySelector('input[name="attempts"]');
+  const capacity = document.querySelector('input[name="capacity"]');
+  const set = (el, value) => {
+    const setter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype, 'value'
+    ).set;
+    setter.call(el, value);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+  set(attempts, '16');
+  set(capacity, '5');
+  [...document.querySelectorAll('button[type="submit"]')]
+    .find((b) => /Run it/.test(b.textContent)).click();
+`);
+
+const verdict = await waitFor(
+  `return document.querySelector('[aria-live="assertive"]')?.innerText || null;`,
+  { timeout: 20000 }
+);
+
+check('the demo reports a result', Boolean(verdict), verdict ?? 'no verdict');
+check(
+  'sixteen buyers cannot oversell five tickets',
+  // The verdict sentence is "16 buyers, 5 tickets, 5 sold."
+  /16 buyers, 5 tickets, 5 sold\./.test(verdict ?? ''),
+  verdict?.split('\n')[0] ?? ''
+);
+check(
+  'the losing attempts are shown as refused, not as errors',
+  await evaluate(
+    `return document.body.innerText.includes('11 were refused');`
+  )
+);
 
 check(
   'no uncaught exceptions in the browser',
