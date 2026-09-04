@@ -49,6 +49,13 @@ error in a currency column.
 `npm test` proves it rather than asserting it: it runs **20 real concurrent
 transactions against 10 real tickets** and checks that exactly ten succeed.
 
+The app shows the same thing to a visitor. **`/engineering`** walks through the
+race, the statement that closes it, and the `CHECK` constraint behind that —
+then hands over a button that fires up to 24 concurrent transactions at a tier
+with fewer tickets than that and reports what the database did. It calls the
+same `claimStock` the checkout does, against a sandbox tier on a `DRAFT` event,
+so nothing it does touches a real event's sales.
+
 ---
 
 ## Running it
@@ -100,7 +107,7 @@ used one and a pending order — because an empty account demos as broken.
 
 ## How it's built
 
-**Next.js 16, App Router, plain JavaScript.** Pages are Server Components that
+**Next.js 16, App Router, TypeScript.** Pages are Server Components that
 query Postgres directly; the HTML that arrives already contains the events. The
 only Client Components are the genuinely interactive pieces — the ticket
 stepper, the filter chips, the account menu, the door scanner.
@@ -111,11 +118,11 @@ endpoint, so "the form only offered your own events" is not a control.
 
 **Sessions** are signed JWTs (`jose`, Web Crypto) in an httpOnly cookie. The
 user row is re-read on every request, so a role change takes effect immediately
-rather than at token expiry. `src/proxy.js` (Next 16 renamed `middleware` to
+rather than at token expiry. `src/proxy.ts` (Next 16 renamed `middleware` to
 `proxy`) bounces signed-out visitors cheaply; the real authorisation is in the
 pages.
 
-**Reads go through `src/lib/events.js`**, and every public one filters on
+**Reads go through `src/lib/events.ts`**, and every public one filters on
 `status: 'PUBLISHED'`. A draft leaking onto the browse page is an organiser's
 unannounced line-up going out early, and that is what happens when each page
 writes its own `where`.
@@ -147,6 +154,17 @@ photographs, and photographs read better on black. There is no light mode and no
 - Type is **Bricolage Grotesque** for display, **Geist** for text, **Geist Mono**
   for prices and ticket codes, all self-hosted via `next/font` — no runtime
   request to Google, no layout shift.
+- The type scale is **named and fluid** — `display`, `title`, `section`,
+  `subhead`, `lead` in `tailwind.config.js`, each carrying its own leading,
+  tracking and weight. The sizes are `clamp()` rather than breakpoint chains, so
+  one class covers every width and the same heading cannot end up a different
+  size on two pages.
+
+Public pages are spacious because they are being browsed; the organiser and
+admin surfaces are dense tables because they are being worked through, and
+sell-through only means anything next to the other sell-throughs. Every route
+has a loading skeleton shaped like the content it stands in for, and every empty
+state carries the action that would fill it.
 
 Covers are real Unsplash photographs, harvested once by
 `scripts/fetch-covers.mjs` into `prisma/covers.json` so seeding never depends on
@@ -158,7 +176,7 @@ OpenStreetMap embed rather than a mapping library — the map is read, not used.
 ## Not built
 
 - **Real payments.** The gateway is a simulator; swapping in Daraja or Stripe is
-  a change to `src/lib/payments.js` and nothing else.
+  a change to `src/lib/payments.ts` and nothing else.
 - **Email.** Confirmations aren't sent; tickets live in the account.
 - **Image upload.** Covers are URLs, restricted to `images.unsplash.com`.
 - **Refunds as a flow.** The `REFUNDED` state exists and renders; nothing issues
