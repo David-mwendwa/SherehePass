@@ -3,6 +3,7 @@ import { Ticket as TicketIcon } from 'lucide-react';
 
 import { Badge, ORDER_TONE } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { TicketStub } from '@/components/tickets/TicketStub';
 import { requireUser } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -50,7 +51,7 @@ export default async function TicketsPage() {
 
   return (
     <div className="container max-w-4xl py-10 sm:py-14">
-      <h1 className="font-heading text-3xl font-bold sm:text-4xl">My tickets</h1>
+      <h1 className="font-heading text-title">My tickets</h1>
       <p className="mt-2 text-dark-400">
         Show the QR code at the gate. Each one scans once.
       </p>
@@ -83,16 +84,13 @@ export default async function TicketsPage() {
       ) : null}
 
       {tickets.length === 0 ? (
-        <div className="surface mt-10 flex flex-col items-center px-6 py-20 text-center">
-          <TicketIcon className="h-10 w-10 text-dark-500" aria-hidden="true" />
-          <h2 className="mt-5 text-xl font-semibold">No tickets yet</h2>
-          <p className="mt-2 max-w-sm text-sm text-dark-400">
-            When you buy one it lands here, with a QR code, straight away.
-          </p>
-          <Button href="/events" className="mt-6">
-            Find something on
-          </Button>
-        </div>
+        <EmptyState
+          className="mt-10"
+          icon={TicketIcon}
+          title="No tickets yet"
+          description="When you buy one it lands here, with a QR code, straight away."
+          action={<Button href="/events">Find something on</Button>}
+        />
       ) : (
         <>
           {upcoming.length > 0 ? (

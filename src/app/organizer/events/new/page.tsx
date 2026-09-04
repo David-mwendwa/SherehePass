@@ -21,7 +21,7 @@ export default async function NewEventPage() {
         <ChevronLeft className="h-4 w-4" />
         Dashboard
       </Link>
-      <h1 className="mb-8 font-heading text-3xl font-bold">New event</h1>
+      <h1 className="mb-8 font-heading text-title">New event</h1>
       <EventForm venues={venues} />
     </div>
   );

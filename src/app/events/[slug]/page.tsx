@@ -107,7 +107,7 @@ export default async function EventPage({
             ) : null}
           </div>
 
-          <h1 className="mt-4 max-w-4xl font-heading text-3xl font-extrabold leading-[1.08] text-white sm:text-5xl lg:text-6xl">
+          <h1 className="mt-4 max-w-4xl font-heading text-display-sm text-white">
             {event.title}
           </h1>
 
@@ -233,7 +233,7 @@ export default async function EventPage({
         {related.length > 0 ? (
           <section className="mt-20">
             <div className="eyebrow mb-2">You might also like</div>
-            <h2 className="mb-6 font-heading text-2xl font-bold">
+            <h2 className="mb-6 font-heading text-section">
               More {CATEGORY_LABELS[event.category].toLowerCase()}, and more
               around {event.venue.county}
             </h2>

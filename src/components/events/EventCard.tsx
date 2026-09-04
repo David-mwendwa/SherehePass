@@ -110,6 +110,9 @@ export function EventCard({
           <span className="font-mono text-[0.625rem] uppercase tracking-widest text-primary-300">
             {month}
           </span>
+          {/* Deliberately off the heading scale. This is a numeral in a 3.5rem
+              chip, not a heading — the scale's sizes are fluid and would grow
+              it out of its own box on a wide screen. */}
           <span className="font-heading text-xl font-bold leading-none text-white">
             {day}
           </span>

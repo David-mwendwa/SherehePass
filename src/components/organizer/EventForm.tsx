@@ -74,7 +74,7 @@ export function EventForm({ event, venues }: EventFormProps) {
       ) : null}
 
       <section className="surface space-y-4 p-6">
-        <h2 className="font-heading text-lg font-bold">The event</h2>
+        <h2 className="font-heading text-subhead">The event</h2>
 
         <Input
           label="Title"
@@ -184,7 +184,7 @@ export function EventForm({ event, venues }: EventFormProps) {
       {!editing ? (
         <section className="surface space-y-4 p-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-heading text-lg font-bold">Ticket tiers</h2>
+            <h2 className="font-heading text-subhead">Ticket tiers</h2>
             <Button
               type="button"
               variant="secondary"

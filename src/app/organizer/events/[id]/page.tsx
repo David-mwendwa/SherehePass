@@ -45,7 +45,7 @@ export default async function ManageEventPage({
 
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-heading text-3xl font-bold">{event.title}</h1>
+          <h1 className="font-heading text-title">{event.title}</h1>
           <p className="mt-1 font-mono text-sm text-secondary-300">
             {formatKes(revenue._sum.totalCents ?? 0)} taken
           </p>

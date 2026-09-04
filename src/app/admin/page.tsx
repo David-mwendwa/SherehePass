@@ -1,14 +1,8 @@
 import Link from 'next/link';
-import {
-  BadgeCheck,
-  CalendarDays,
-  TrendingUp,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
-import type { ReactNode } from 'react';
+import { BadgeCheck, CalendarDays, TrendingUp, Users } from 'lucide-react';
 
-import { Badge, EVENT_TONE, ORDER_TONE } from '@/components/ui/Badge';
+import { Badge, ORDER_TONE } from '@/components/ui/Badge';
+import { Stat } from '@/components/ui/Stat';
 import { requireRole } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { formatEventDate, formatKes } from '@/lib/format';
@@ -49,61 +43,66 @@ export default async function AdminPage() {
 
   return (
     <div className="container py-10 sm:py-14">
-      <p className="eyebrow mb-2">Platform</p>
-      <h1 className="font-heading text-3xl font-bold sm:text-4xl">Admin</h1>
+      <p className="eyebrow mb-1.5">Platform</p>
+      <h1 className="font-heading text-title">Admin</h1>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={TrendingUp} label="Gross sales" value={formatKes(revenue._sum.totalCents ?? 0)} />
+      <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat
+          icon={TrendingUp}
+          label="Gross sales"
+          value={formatKes(revenue._sum.totalCents ?? 0)}
+          hint="Paid orders, all organisers"
+        />
         <Stat icon={Users} label="Accounts" value={users} />
         <Stat icon={BadgeCheck} label="Organisers" value={organizers} />
         <Stat icon={CalendarDays} label="Published events" value={events} />
       </div>
 
-      <div className="mt-12 grid gap-8 lg:grid-cols-2">
+      <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <section>
-          <h2 className="eyebrow mb-4">Recent orders</h2>
-          <div className="surface divide-y divide-white/[0.06]">
+          <h2 className="eyebrow mb-3">Recent orders</h2>
+          <div className="surface overflow-hidden">
             {recentOrders.map((order) => (
               <div
                 key={order.id}
-                className="flex items-center justify-between gap-4 px-5 py-3.5"
+                className="data-row grid-cols-[1fr_auto_auto]"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-white">
-                    {order.event.title}
-                  </p>
+                  <p className="truncate text-white">{order.event.title}</p>
                   <p className="truncate font-mono text-xs text-dark-500">
                     {order.reference} · {order.user.name}
                   </p>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="font-mono text-sm text-secondary-300">
-                    {formatKes(order.totalCents)}
-                  </p>
-                  <Badge tone={ORDER_TONE[order.status]} className="mt-1">
-                    {order.status.toLowerCase()}
-                  </Badge>
-                </div>
+                <span className="shrink-0 font-mono text-xs tabular-nums text-secondary-300">
+                  {formatKes(order.totalCents)}
+                </span>
+                <Badge tone={ORDER_TONE[order.status]}>
+                  {order.status.toLowerCase()}
+                </Badge>
               </div>
             ))}
           </div>
         </section>
 
         <section>
-          <h2 className="eyebrow mb-4">Next on sale</h2>
-          <div className="surface divide-y divide-white/[0.06]">
+          <h2 className="eyebrow mb-3">Next on sale</h2>
+          <div className="surface overflow-hidden">
             {topEvents.map((event) => {
-              const capacity = event.ticketTypes.reduce((s, t) => s + t.quantity, 0);
+              const capacity = event.ticketTypes.reduce(
+                (s, t) => s + t.quantity,
+                0
+              );
               const sold = event.ticketTypes.reduce((s, t) => s + t.sold, 0);
+              const pct = capacity ? Math.round((sold / capacity) * 100) : 0;
               return (
                 <div
                   key={event.id}
-                  className="flex items-center justify-between gap-4 px-5 py-3.5"
+                  className="data-row grid-cols-[1fr_5rem_auto]"
                 >
                   <div className="min-w-0">
                     <Link
                       href={`/events/${event.slug}`}
-                      className="truncate text-sm text-white transition-colors hover:text-primary-300"
+                      className="block truncate text-white transition-colors hover:text-primary-300"
                     >
                       {event.title}
                     </Link>
@@ -111,7 +110,13 @@ export default async function AdminPage() {
                       {event.organizer.name} · {formatEventDate(event.startsAt)}
                     </p>
                   </div>
-                  <span className="shrink-0 font-mono text-xs text-dark-400">
+                  <div className="h-1 overflow-hidden rounded-full bg-white/[0.07]">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-primary-600 to-primary-400"
+                      style={{ width: `${Math.min(100, pct)}%` }}
+                    />
+                  </div>
+                  <span className="shrink-0 font-mono text-xs tabular-nums text-dark-400">
                     {sold}/{capacity}
                   </span>
                 </div>
@@ -120,26 +125,6 @@ export default async function AdminPage() {
           </div>
         </section>
       </div>
-    </div>
-  );
-}
-
-function Stat({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: ReactNode;
-}) {
-  return (
-    <div className="surface p-5">
-      <div className="flex items-center gap-2 text-dark-400">
-        <Icon className="h-4 w-4" />
-        <span className="eyebrow">{label}</span>
-      </div>
-      <p className="mt-3 font-heading text-2xl font-bold text-white">{value}</p>
     </div>
   );
 }

@@ -25,6 +25,46 @@ export default {
         heading: ['var(--font-heading)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
+      // A named type scale, each step carrying its own leading, tracking and
+      // weight — the three things that have to move together as type gets
+      // bigger and were previously restated at every heading.
+      //
+      // The sizes are `clamp()` rather than `text-3xl sm:text-4xl lg:text-5xl`,
+      // so one class covers every width. That is not only shorter: breakpoint
+      // chains meant the same heading was a different size on two pages because
+      // one of them had picked up an extra `lg:` step, and type that resizes
+      // continuously has no awkward width just below a breakpoint.
+      fontSize: {
+        // The home hero, and nothing else.
+        display: [
+          'clamp(2.75rem, 5.5vw + 1rem, 4.5rem)',
+          { lineHeight: '1.02', letterSpacing: '-0.035em', fontWeight: '800' },
+        ],
+        // Secondary heroes — an event title over its cover, the seller pitch.
+        // A step down from `display` so the home page stays the loudest thing
+        // in the product.
+        'display-sm': [
+          'clamp(2.25rem, 3.2vw + 1.1rem, 3.5rem)',
+          { lineHeight: '1.06', letterSpacing: '-0.03em', fontWeight: '800' },
+        ],
+        // Page title — the <h1> of an ordinary route.
+        title: [
+          'clamp(2rem, 2.5vw + 1.1rem, 2.75rem)',
+          { lineHeight: '1.08', letterSpacing: '-0.028em', fontWeight: '700' },
+        ],
+        // Section <h2>.
+        section: [
+          'clamp(1.5rem, 1.6vw + 1rem, 1.875rem)',
+          { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '700' },
+        ],
+        // Card and panel <h3>.
+        subhead: [
+          '1.0625rem',
+          { lineHeight: '1.4', letterSpacing: '-0.011em', fontWeight: '600' },
+        ],
+        // Standfirst under a title. Larger and looser than body copy.
+        lead: ['1.0625rem', { lineHeight: '1.65', letterSpacing: '-0.006em' }],
+      },
       colors: {
         // Shocking pink. The brand colour and the loudest thing on screen, so
         // it is rationed: glows, the logo, the active state, and nothing else.

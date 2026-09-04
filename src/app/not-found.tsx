@@ -8,7 +8,7 @@ export default function NotFound() {
       <div className="bloom" />
       <div className="relative">
         <p className="font-mono text-sm text-primary-400">404</p>
-        <h1 className="mt-3 font-heading text-4xl font-bold">
+        <h1 className="mt-3 font-heading text-title">
           Nothing on here
         </h1>
         <p className="mx-auto mt-3 max-w-sm text-dark-400">

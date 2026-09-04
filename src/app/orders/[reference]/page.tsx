@@ -82,7 +82,7 @@ export default async function OrderPage({
         <div className="bloom opacity-50" />
         <div className="relative">
           <Icon className={`mx-auto h-12 w-12 ${state.tone}`} aria-hidden="true" />
-          <h1 className="mt-5 font-heading text-3xl font-bold">{state.title}</h1>
+          <h1 className="mt-5 font-heading text-title">{state.title}</h1>
           <p className="mx-auto mt-3 max-w-md text-dark-400">{state.body}</p>
 
           <dl className="mx-auto mt-8 grid max-w-sm grid-cols-2 gap-y-3 text-sm">

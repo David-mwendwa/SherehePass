@@ -17,7 +17,7 @@ export default async function SignUpPage({
   return (
     <>
       <div className="mb-8 text-center">
-        <h1 className="font-heading text-3xl font-bold">Create an account</h1>
+        <h1 className="font-heading text-title">Create an account</h1>
         <p className="mt-2 text-sm text-dark-400">
           Takes a moment. You need one to hold a ticket.
         </p>

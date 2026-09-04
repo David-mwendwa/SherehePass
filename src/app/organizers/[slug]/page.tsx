@@ -26,7 +26,7 @@ export default async function OrganizerPage({
     <div className="container max-w-5xl py-10 sm:py-14">
       <header className="max-w-2xl">
         <div className="flex items-center gap-2.5">
-          <h1 className="font-heading text-3xl font-bold sm:text-4xl">
+          <h1 className="font-heading text-title">
             {organizer.name}
           </h1>
           {organizer.verified ? (

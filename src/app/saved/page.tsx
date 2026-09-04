@@ -1,6 +1,7 @@
 import { Bookmark } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { EventCard } from '@/components/events/EventCard';
 import { requireUser } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -43,22 +44,19 @@ export default async function SavedPage() {
 
   return (
     <div className="container py-10 sm:py-14">
-      <h1 className="font-heading text-3xl font-bold sm:text-4xl">Saved</h1>
+      <h1 className="font-heading text-title">Saved</h1>
       <p className="mt-2 text-dark-400">
         Things you bookmarked. Nothing is held for you — saving is not buying.
       </p>
 
       {saves.length === 0 ? (
-        <div className="surface mt-10 flex flex-col items-center px-6 py-20 text-center">
-          <Bookmark className="h-10 w-10 text-dark-500" aria-hidden="true" />
-          <h2 className="mt-5 text-xl font-semibold">Nothing saved yet</h2>
-          <p className="mt-2 max-w-sm text-sm text-dark-400">
-            Hit “Save for later” on anything you are undecided about.
-          </p>
-          <Button href="/events" className="mt-6">
-            Browse events
-          </Button>
-        </div>
+        <EmptyState
+          className="mt-10"
+          icon={Bookmark}
+          title="Nothing saved yet"
+          description="Hit “Save for later” on anything you are undecided about. It stays here until you decide."
+          action={<Button href="/events">Browse events</Button>}
+        />
       ) : (
         <>
           {live.length > 0 ? (

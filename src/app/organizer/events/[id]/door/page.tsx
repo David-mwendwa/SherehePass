@@ -47,7 +47,7 @@ export default async function DoorPage({
       </Link>
 
       <p className="eyebrow mb-2">Door</p>
-      <h1 className="font-heading text-2xl font-bold sm:text-3xl">
+      <h1 className="font-heading text-section">
         {event.title}
       </h1>
       <p className="mt-1 text-sm text-dark-400">

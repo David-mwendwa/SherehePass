@@ -37,6 +37,17 @@
   h5,
   h6 {
     @apply font-heading tracking-tight text-white;
+    /* Headings are short and wrap badly by default — a six-word title
+       regularly left one word alone on line two. `balance` evens the lines
+       out; it is capped by the browser at a few lines, which is why it is on
+       headings and not on paragraphs. */
+    text-wrap: balance;
+  }
+
+  p {
+    /* The cheap half of the same idea: no single-word last line. Unlike
+       `balance` this has no line limit, so it is safe on body copy. */
+    text-wrap: pretty;
   }
 
   /* A visible, branded focus ring everywhere, rather than the browser default
@@ -68,6 +79,49 @@
   /* Small uppercase label used for section eyebrows and metadata. */
   .eyebrow {
     @apply font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-dark-400;
+  }
+
+  /* The standfirst under a page title. */
+  .lede {
+    @apply max-w-2xl text-lead text-dark-300;
+  }
+
+  /* Cards that are themselves links. The lift is small on purpose: it should
+     read as the card acknowledging the pointer, not as it jumping. */
+  .card-lift {
+    @apply transition-[transform,border-color,background-color,box-shadow] duration-300 ease-out;
+  }
+
+  .card-lift:hover {
+    @apply -translate-y-0.5 border-white/[0.14] shadow-card-hover;
+  }
+
+  /* Whole-card links: the anchor covers the card via ::after, so the entire
+     surface is clickable while only the title is in the tab order and read
+     out as the link. Nesting a second <a> inside the same card breaks that,
+     which is why interactive children need `relative z-10`. */
+  .card-link::after {
+    content: '';
+    @apply absolute inset-0 z-0;
+  }
+
+  /* Empty states. One shape everywhere: an icon, a line saying what is not
+     here, a line saying why, and — when there is one — the action that would
+     fill it. A blank area with "No results" is a dead end; the difference is
+     the last part. */
+  .empty-state {
+    @apply flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.09] bg-white/[0.015] px-6 py-14 text-center;
+  }
+
+  /* Dense rows for the organiser and admin tables. Public pages are spacious
+     because they are being browsed; these are being worked through, and an
+     operator wants more rows on screen, not more air around each one. */
+  .data-row {
+    @apply grid items-center gap-3 border-b border-white/[0.05] px-4 py-2.5 text-sm transition-colors last:border-0 hover:bg-white/[0.025];
+  }
+
+  .data-head {
+    @apply grid items-center gap-3 border-b border-white/[0.07] bg-white/[0.02] px-4 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-dark-500;
   }
 
   /* The pink glow behind the hero and the featured card. Two blurred radial

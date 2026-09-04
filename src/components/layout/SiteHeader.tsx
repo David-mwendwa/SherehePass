@@ -1,23 +1,20 @@
 import Link from 'next/link';
 import { Search, Ticket } from 'lucide-react';
 
+import { Suspense } from 'react';
+
 import type { CurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/layout/Logo';
+import { MainNav } from '@/components/layout/MainNav';
 import { UserMenu } from '@/components/layout/UserMenu';
 
 /**
  * The header is a Server Component: it knows who is signed in without shipping
- * the user object, the session logic or a fetch to the browser. Only the two
- * genuinely interactive pieces — the account dropdown and the mobile menu —
- * are client components, and they live inside UserMenu.
+ * the user object, the session logic or a fetch to the browser. Only the pieces
+ * that genuinely need the browser — the account dropdown, and the nav that has
+ * to mark the current page — are client components.
  */
-const NAV = [
-  { href: '/events', label: 'Browse' },
-  { href: '/events?when=this-weekend', label: 'This weekend' },
-  { href: '/organizers', label: 'Organisers' },
-];
-
 export function SiteHeader({ user }: { user: CurrentUser | null }) {
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-dark-950/80 backdrop-blur-xl">
@@ -29,17 +26,14 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
           <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="rounded-lg px-3 py-2 text-sm text-dark-300 transition-colors hover:bg-white/[0.06] hover:text-white"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {/* `useSearchParams` opts its subtree out of static rendering, so the
+            nav is wrapped rather than left to bubble that up to the whole
+            header. The fallback reserves the same width so nothing shifts. */}
+        <Suspense
+          fallback={<div className="hidden h-9 w-72 md:block" aria-hidden="true" />}
+        >
+          <MainNav />
+        </Suspense>
 
         <div className="ml-auto flex items-center gap-2">
           <Link

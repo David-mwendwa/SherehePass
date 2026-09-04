@@ -123,7 +123,7 @@ export function DoorScanner({
             />
           )}
           <div className="min-w-0">
-            <p className="font-heading text-xl font-bold text-white">
+            <p className="font-heading text-section text-white">
               {latest.message}
             </p>
             {latest.holderName ? (

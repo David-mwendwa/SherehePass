@@ -92,7 +92,7 @@ export function TicketPicker({
   return (
     <div className="surface overflow-hidden">
       <div className="border-b border-white/[0.06] px-5 py-4">
-        <h2 className="flex items-center gap-2 font-heading text-lg font-bold">
+        <h2 className="flex items-center gap-2 font-heading text-subhead">
           <Ticket className="h-4 w-4 text-primary-400" />
           Tickets
         </h2>
@@ -214,13 +214,20 @@ function Stepper({ value, max, disabled, label, onAdjust }: StepperProps) {
         <Minus className="h-3.5 w-3.5" />
       </button>
 
-      {/* The live region is what makes the stepper usable without sight: the
-          number changing on screen is otherwise silent. */}
+      {/* The visible number is hidden from assistive tech and announced by the
+          live region beside it instead. A live region containing only the digit
+          announces "2", which does not say two of what — and with several tiers
+          on the page, that is the only part that matters. */}
       <span
-        aria-live="polite"
+        aria-hidden="true"
         className="w-6 text-center font-mono text-sm text-white"
       >
         {value}
+      </span>
+      <span aria-live="polite" className="sr-only">
+        {value === 0
+          ? `No ${label} tickets selected`
+          : `${value} ${label} ticket${value === 1 ? '' : 's'} selected`}
       </span>
 
       <button

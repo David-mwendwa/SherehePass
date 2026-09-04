@@ -60,7 +60,7 @@ export function CheckoutForm({
       ) : null}
 
       <section className="surface p-6">
-        <h2 className="mb-5 font-heading text-lg font-bold">Who is going</h2>
+        <h2 className="mb-5 font-heading text-subhead">Who is going</h2>
         <div className="space-y-4">
           <Input
             label="Name on the tickets"
@@ -85,7 +85,7 @@ export function CheckoutForm({
 
       {!free ? (
         <section className="surface p-6">
-          <h2 className="mb-5 font-heading text-lg font-bold">How you’ll pay</h2>
+          <h2 className="mb-5 font-heading text-subhead">How you’ll pay</h2>
 
           <div
             role="radiogroup"

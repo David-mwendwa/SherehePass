@@ -87,7 +87,7 @@ export default async function CheckoutPage({
         Back to {event.title}
       </Link>
 
-      <h1 className="font-heading text-3xl font-bold sm:text-4xl">Checkout</h1>
+      <h1 className="font-heading text-title">Checkout</h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
         <CheckoutForm

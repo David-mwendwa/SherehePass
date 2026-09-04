@@ -29,7 +29,7 @@ export default async function AccountPage() {
 
   return (
     <div className="container max-w-2xl py-10 sm:py-14">
-      <h1 className="font-heading text-3xl font-bold sm:text-4xl">Account</h1>
+      <h1 className="font-heading text-title">Account</h1>
 
       <section className="surface mt-8 p-6">
         <dl className="space-y-4">
@@ -92,7 +92,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="surface p-5 text-center">
-      <p className="font-heading text-2xl font-bold text-white">{value}</p>
+      <p className="font-heading text-section text-white">{value}</p>
       <p className="eyebrow mt-1">{label}</p>
     </div>
   );

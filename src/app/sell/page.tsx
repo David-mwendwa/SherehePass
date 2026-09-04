@@ -30,7 +30,7 @@ export default async function SellPage() {
       <div className="bloom" />
       <div className="container relative max-w-3xl py-16 sm:py-24">
         <p className="eyebrow mb-4">For organisers</p>
-        <h1 className="font-heading text-4xl font-extrabold leading-tight sm:text-5xl">
+        <h1 className="font-heading text-display-sm">
           Put it on sale in an afternoon.
         </h1>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-dark-300">
@@ -56,7 +56,7 @@ export default async function SellPage() {
         <div className="mt-16 space-y-8">
           {POINTS.map((point) => (
             <div key={point.title} className="surface p-6">
-              <h2 className="font-heading text-lg font-bold">{point.title}</h2>
+              <h2 className="font-heading text-subhead">{point.title}</h2>
               <p className="mt-2 leading-relaxed text-dark-400">{point.body}</p>
             </div>
           ))}

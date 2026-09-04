@@ -37,7 +37,7 @@ const SECTIONS = [
 export default function HelpPage() {
   return (
     <div className="container max-w-2xl py-12 sm:py-16">
-      <h1 className="font-heading text-4xl font-bold">How it works</h1>
+      <h1 className="font-heading text-title">How it works</h1>
       <p className="mt-3 text-dark-400">
         Short version: pick, pay, show the code.
       </p>
@@ -45,7 +45,7 @@ export default function HelpPage() {
       <div className="mt-12 space-y-10">
         {SECTIONS.map((section) => (
           <section key={section.heading}>
-            <h2 className="font-heading text-xl font-bold">{section.heading}</h2>
+            <h2 className="font-heading text-section">{section.heading}</h2>
             <div className="mt-3 space-y-3">
               {section.body.map((paragraph, index) => (
                 <p key={index} className="leading-relaxed text-dark-300">

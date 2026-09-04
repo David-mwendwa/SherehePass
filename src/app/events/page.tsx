@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { SearchX } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { EventCard } from '@/components/events/EventCard';
 import { FilterBar } from '@/components/events/FilterBar';
 import { SearchBar } from '@/components/events/SearchBar';
@@ -76,7 +77,7 @@ export default async function EventsPage({
   return (
     <div className="container py-10 sm:py-14">
       <header className="max-w-2xl">
-        <h1 className="font-heading text-3xl font-bold sm:text-4xl">
+        <h1 className="font-heading text-title">
           {params.q ? (
             <>
               Results for <span className="text-primary-400">“{params.q}”</span>
@@ -85,7 +86,10 @@ export default async function EventsPage({
             'What’s on'
           )}
         </h1>
-        <p className="mt-2 text-dark-400">
+        {/* Filtering swaps the results without moving focus, so the count is a
+            live region: otherwise a screen reader user presses a filter chip
+            and gets no confirmation that anything changed. */}
+        <p role="status" aria-live="polite" className="mt-2 text-dark-400">
           {total === 0
             ? 'Nothing matches those filters.'
             : `${total} event${total === 1 ? '' : 's'} on sale.`}
@@ -120,17 +124,17 @@ export default async function EventsPage({
 
 function EmptyResults() {
   return (
-    <div className="surface mt-10 flex flex-col items-center px-6 py-20 text-center">
-      <SearchX className="h-10 w-10 text-dark-500" aria-hidden="true" />
-      <h2 className="mt-5 text-xl font-semibold">No events match</h2>
-      <p className="mt-2 max-w-sm text-sm text-dark-400">
-        Try widening the date range, or clearing the county filter — most events
-        are in Nairobi but not all of them.
-      </p>
-      <Button href="/events" variant="secondary" className="mt-6">
-        Clear all filters
-      </Button>
-    </div>
+    <EmptyState
+      className="mt-10"
+      icon={SearchX}
+      title="No events match"
+      description="Try widening the date range, or clearing the county filter — most events are in Nairobi, but not all of them."
+      action={
+        <Button href="/events" variant="secondary">
+          Clear all filters
+        </Button>
+      }
+    />
   );
 }
 
@@ -168,17 +172,28 @@ function Pagination({
     >
       {page > 1 ? (
         <Button href={linkTo(page - 1)} variant="secondary" size="sm">
-          Previous
+          Previous<span className="sr-only"> page</span>
         </Button>
       ) : null}
 
-      <span className="px-4 font-mono text-sm text-dark-400">
-        {page} / {pages}
+      {/* `aria-current="page"` is what tells a screen reader this is a position
+          indicator rather than a link it failed to find. The visible "3 / 12"
+          is hidden from it and read out in full instead. */}
+      <span
+        aria-current="page"
+        className="px-4 font-mono text-sm text-dark-400"
+      >
+        <span aria-hidden="true">
+          {page} / {pages}
+        </span>
+        <span className="sr-only">
+          Page {page} of {pages}
+        </span>
       </span>
 
       {page < pages ? (
         <Button href={linkTo(page + 1)} variant="secondary" size="sm">
-          Next
+          Next<span className="sr-only"> page</span>
         </Button>
       ) : null}
     </nav>

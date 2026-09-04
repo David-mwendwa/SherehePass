@@ -19,7 +19,7 @@ export default async function SignInPage({
   return (
     <>
       <div className="mb-8 text-center">
-        <h1 className="font-heading text-3xl font-bold">Welcome back</h1>
+        <h1 className="font-heading text-title">Welcome back</h1>
         <p className="mt-2 text-sm text-dark-400">
           Your tickets are waiting where you left them.
         </p>

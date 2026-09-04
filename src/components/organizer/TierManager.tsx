@@ -36,7 +36,7 @@ export function TierManager({ eventId, tiers }: TierManagerProps) {
   return (
     <section className="surface overflow-hidden">
       <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
-        <h2 className="font-heading text-lg font-bold">Ticket tiers</h2>
+        <h2 className="font-heading text-subhead">Ticket tiers</h2>
         <Button
           type="button"
           variant="secondary"

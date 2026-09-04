@@ -15,7 +15,7 @@ export default async function OrganizersPage() {
 
   return (
     <div className="container max-w-5xl py-10 sm:py-14">
-      <h1 className="font-heading text-3xl font-bold sm:text-4xl">Organisers</h1>
+      <h1 className="font-heading text-title">Organisers</h1>
       <p className="mt-2 max-w-lg text-dark-400">
         The promoters, communities and clubs putting these on. A verified badge
         means we have confirmed who they are.

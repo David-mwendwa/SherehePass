@@ -44,11 +44,20 @@ const CHECKED_PREFIXES = [
 // A bare numeric or decimal value: h-4, w-4.5, p-2.5. Arbitrary values
 // (h-[42px]), fractions (w-1/2) and keywords (h-full) are all skipped — those
 // either cannot be wrong in this way or are checked by the browser.
+//
 // The leading `-?` matters: `-mx-1` is a valid negative margin, and matching
 // only `mx-1` out of the middle of it reports a class that is really there.
 // `(?<![\w-])` stops `flex-1` being read as the utility `1`.
+//
+// The variant chain is generic rather than a list of the built-in variants.
+// It was a list, and the list did not know about the typography plugin, so
+// `prose-code:px-1.5` matched as a bare `px-1.5` — which Tailwind had no reason
+// to emit, because the only place it appears is behind that variant. The check
+// then reported a class that exists and is working. Matching the whole thing
+// including its variants is both more general and what the CSS actually
+// contains: Tailwind's selector for it is `.prose-code\:px-1\.5`.
 const CANDIDATE = new RegExp(
-  `(?<![\\w-])-?(?:(?:sm|md|lg|xl|2xl|hover|focus|focus-visible|active|disabled|group-hover|first|last|odd|even):)*` +
+  `(?<![\\w-])-?(?:[a-z][a-z0-9-]*:)*` +
     `(?:${CHECKED_PREFIXES.join('|')})-\\d+(?:\\.\\d+)?(?![\\w-])`,
   'g'
 );
