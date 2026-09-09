@@ -8,6 +8,17 @@ import { cn } from '@/lib/cn';
  * Inline SVG rather than a file, because it takes its colour from `currentColor`
  * and so works on the dark header, on a pink button and in the footer without
  * three copies existing.
+ *
+ * Two standalone copies exist for the browser chrome and do NOT update
+ * themselves when this changes — edit all three together:
+ *
+ *   src/app/icon.svg        the tab icon, same geometry as this.
+ *   src/app/apple-icon.svg  the same mark, padded, because the iOS
+ *                           home-screen mask crops to a rounded square and
+ *                           clips anything near the edge.
+ *
+ * Those two are served to the browser verbatim, so they carry no comments of
+ * their own; this is where their reasoning lives.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
