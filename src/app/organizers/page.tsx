@@ -5,6 +5,7 @@ import { listOrganizers } from '@/lib/events';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
+  alternates: { canonical: '/organizers' },
   title: 'Organisers',
   description:
     'The promoters, communities and clubs putting on events across Kenya.',

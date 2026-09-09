@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 import { formatEventDateLong } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Door' };
+export const metadata = { title: 'Door', robots: { index: false, follow: false } };
 
 export default async function DoorPage({
   params,

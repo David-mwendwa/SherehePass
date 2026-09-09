@@ -9,7 +9,7 @@ import { getEventBySlug } from '@/lib/events';
 import { calendarParts, formatKes } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Checkout' };
+export const metadata = { title: 'Checkout', robots: { index: false, follow: false } };
 
 /**
  * The selection arrives in the querystring as "tierId:qty,tierId:qty".

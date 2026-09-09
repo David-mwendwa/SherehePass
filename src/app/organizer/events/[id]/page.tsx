@@ -10,7 +10,7 @@ import { db } from '@/lib/db';
 import { formatKes } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Manage event' };
+export const metadata = { title: 'Manage event', robots: { index: false, follow: false } };
 
 export default async function ManageEventPage({
   params,

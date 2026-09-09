@@ -19,6 +19,12 @@ import {
   getSellingFastEvents,
   getUpcomingEvents,
 } from '@/lib/events';
+import {
+  DEFAULT_DESCRIPTION,
+  jsonLdScript,
+  organizationJsonLd,
+  websiteJsonLd,
+} from '@/lib/seo';
 
 /**
  * The home page is a Server Component that queries Postgres directly. There is
@@ -30,6 +36,14 @@ import {
 // Sales move constantly, so the page is rendered per request rather than
 // cached — a "12 left" badge that is an hour stale is worse than none.
 export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  // The layout's title template appends the brand to every page name, so the
+  // home page has to opt out of it or it reads "SherehePass · SherehePass".
+  title: { absolute: 'SherehePass — live events in Kenya' },
+  description: DEFAULT_DESCRIPTION,
+  alternates: { canonical: '/' },
+};
 
 export default async function HomePage() {
   // Partly sequential, on purpose: each section excludes what the one above it
@@ -51,6 +65,19 @@ export default async function HomePage() {
 
   return (
     <>
+      {/*
+        Organization and WebSite are declared once, on the home page, rather
+        than in the layout: repeating a site-level graph on every route is
+        noise a crawler has to reconcile, and the home page is the URL both
+        describe.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript([organizationJsonLd(), websiteJsonLd()]),
+        }}
+      />
+
       {/* ------------------------------------------------------------ hero */}
       <section className="relative overflow-hidden">
         <div className="bloom" />

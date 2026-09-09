@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { getCurrentUser } from '@/lib/auth';
 
-export const metadata = { title: 'Sign in' };
+export const metadata = { title: 'Sign in', robots: { index: false, follow: false } };
 
 export default async function SignInPage({
   searchParams,

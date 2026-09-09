@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 import { formatEventDate, formatKes } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Admin' };
+export const metadata = { title: 'Admin', robots: { index: false, follow: false } };
 
 export default async function AdminPage() {
   await requireRole(['ADMIN'], '/admin');

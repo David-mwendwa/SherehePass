@@ -12,7 +12,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const organizer = await getOrganizerBySlug(slug);
   if (!organizer) return { title: 'Organiser not found' };
-  return { title: organizer.name, description: organizer.bio ?? undefined };
+  return {
+    title: organizer.name,
+    description: organizer.bio ?? undefined,
+    alternates: { canonical: `/organizers/${slug}` },
+  };
 }
 
 export default async function OrganizerPage({

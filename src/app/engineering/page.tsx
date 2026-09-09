@@ -13,10 +13,9 @@ import { OversellDemo } from '@/components/engineering/OversellDemo';
 import { DEMO_LIMITS } from '@/lib/oversell/contract';
 import { cn } from '@/lib/cn';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata = {
   title: 'How it cannot oversell',
+  alternates: { canonical: '/engineering' },
   description:
     'The concurrency problem at the centre of ticketing, the conditional UPDATE that solves it, and a live demonstration you can run against the database.',
 };

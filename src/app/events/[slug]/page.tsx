@@ -25,6 +25,12 @@ import {
   formatEventWindow,
   relativeToNow,
 } from '@/lib/format';
+import {
+  absoluteUrl,
+  breadcrumbJsonLd,
+  eventJsonLd,
+  jsonLdScript,
+} from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,11 +45,13 @@ export async function generateMetadata({
   return {
     title: event.title,
     description: event.summary,
+    alternates: { canonical: `/events/${event.slug}` },
     openGraph: {
       title: event.title,
       description: event.summary,
       images: [{ url: event.coverImage, width: 1400, height: 933 }],
       type: 'website',
+      url: absoluteUrl(`/events/${event.slug}`),
     },
   };
 }
@@ -85,6 +93,27 @@ export default async function EventPage({
 
   return (
     <article>
+      {/*
+        The graph is emitted for cancelled and past events too. Their pages are
+        legitimate destinations — someone searching for an event that was called
+        off should reach the page that says so — and `eventJsonLd` is what marks
+        them EventCancelled and withdraws the offers, so dropping it here would
+        remove the very statement that keeps the markup honest.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript([
+            eventJsonLd(event),
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Events', path: '/events' },
+              { name: event.title, path: `/events/${event.slug}` },
+            ]),
+          ]),
+        }}
+      />
+
       {/* ----------------------------------------------------------- cover */}
       <div className="relative h-[42vh] min-h-[320px] w-full sm:h-[52vh]">
         <Image

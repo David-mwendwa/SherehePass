@@ -7,7 +7,7 @@ import { db } from '@/lib/db';
 import { formatKes } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Account' };
+export const metadata = { title: 'Account', robots: { index: false, follow: false } };
 
 const ROLE_LABELS = {
   ATTENDEE: 'Attendee',

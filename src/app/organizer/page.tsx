@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 import { formatKes } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Organiser dashboard' };
+export const metadata = { title: 'Organiser dashboard', robots: { index: false, follow: false } };
 
 async function loadDashboard(organizerId: string) {
   const [events, revenue, ticketsSold, attendees] = await Promise.all([

@@ -1,4 +1,5 @@
 export const metadata = {
+  alternates: { canonical: '/help' },
   title: 'How it works',
   description: 'Buying, holding and using a ticket on SherehePass.',
 };

@@ -49,7 +49,28 @@ export async function generateMetadata({
   if (params.county) parts.push(`in ${params.county}`);
   if (params.q) parts.push(`matching “${params.q}”`);
 
-  return { title: parts.filter(Boolean).join(' ') };
+  /*
+   * What a filtered listing claims to be.
+   *
+   * Category x county x search x page multiplies into effectively unlimited
+   * URLs over the same events. Left alone a crawler treats each as its own
+   * page, spends the budget on permutations, and has to guess which near
+   * identical one to rank. So: a search is a query someone typed rather than a
+   * page this site offers and is not indexed at all; a category or county
+   * filter consolidates onto /events; and pagination stays self-referential,
+   * because pointing page 2 at page 1 declares page 2 a duplicate and the
+   * events reachable only from it stop being discovered.
+   */
+  const search = readString(params.q);
+  const page = Math.max(1, Number(params.page) || 1);
+
+  return {
+    title: parts.filter(Boolean).join(' '),
+    ...(search ? { robots: { index: false, follow: true } } : null),
+    alternates: {
+      canonical: page > 1 ? `/events?page=${page}` : '/events',
+    },
+  };
 }
 
 export default async function EventsPage({

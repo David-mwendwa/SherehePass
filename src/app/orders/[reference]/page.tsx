@@ -10,7 +10,7 @@ import { db } from '@/lib/db';
 import { formatKes } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Your order' };
+export const metadata = { title: 'Your order', robots: { index: false, follow: false } };
 
 export default async function OrderPage({
   params,

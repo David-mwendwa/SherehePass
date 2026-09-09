@@ -10,7 +10,7 @@ import { db } from '@/lib/db';
 import { formatKes } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'My tickets' };
+export const metadata = { title: 'My tickets', robots: { index: false, follow: false } };
 
 export default async function TicketsPage() {
   const user = await requireUser('/tickets');

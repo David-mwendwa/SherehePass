@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
+  alternates: { canonical: '/sell' },
   title: 'Sell tickets',
   description: 'Put your event on SherehePass.',
 };
