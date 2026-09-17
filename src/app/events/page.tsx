@@ -129,11 +129,19 @@ export default async function EventsPage({
         <EmptyResults />
       ) : (
         <>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {events.map((event, index) => (
-              <EventCard key={event.id} event={event} priority={index < 4} />
-            ))}
-          </div>
+          {/* The cards' own titles are h3, so without this the page jumps h1 to
+              h3 and a screen-reader user loses the nesting. It also gives the
+              results a name in a landmark list. */}
+          <section aria-labelledby="results-heading" className="mt-10">
+            <h2 id="results-heading" className="sr-only">
+              {total} event{total === 1 ? '' : 's'} matching these filters
+            </h2>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {events.map((event, index) => (
+                <EventCard key={event.id} event={event} priority={index < 4} />
+              ))}
+            </div>
+          </section>
           {pages > 1 ? (
             <Pagination page={page} pages={pages} params={params} />
           ) : null}

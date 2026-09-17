@@ -59,8 +59,8 @@ export default function HelpPage() {
       </div>
 
       <p className="mt-14 rounded-xl border border-white/[0.07] bg-dark-900/60 px-5 py-4 text-sm text-dark-400">
-        SherehePass is a portfolio project. Payments run in a simulator: no
-        money moves, and no card or M-Pesa credentials are ever collected.
+        Payments run in a simulator: no money moves, and no card or M-Pesa
+        credentials are ever collected.
       </p>
     </div>
   );

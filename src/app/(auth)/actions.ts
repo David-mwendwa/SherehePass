@@ -54,6 +54,27 @@ function safeRedirect(next: FormDataEntryValue | null | undefined): string {
   return next;
 }
 
+/**
+ * Where each role lands when nothing else was asked for.
+ *
+ * An admin signing in wants the console, not the attendee's home page; an
+ * organiser wants their events. Only used when there is no `next` — a reader
+ * bounced here from a protected route still goes back to the page they wanted,
+ * which is the more specific intent.
+ */
+const LANDING_BY_ROLE: Record<Role, string> = {
+  ADMIN: '/admin',
+  ORGANIZER: '/organizer',
+  ATTENDEE: '/',
+};
+
+function destinationFor(
+  role: Role,
+  next: FormDataEntryValue | null | undefined
+): string {
+  return typeof next === 'string' && next ? safeRedirect(next) : LANDING_BY_ROLE[role];
+}
+
 async function startSession(user: { id: string; role: Role }): Promise<void> {
   const token = await signSession({ sub: user.id, role: user.role });
   (await cookies()).set(SESSION_COOKIE, token, sessionCookieOptions);
@@ -94,7 +115,7 @@ export async function signUpAction(
   });
 
   await startSession(user);
-  redirect(safeRedirect(formData.get('next')));
+  redirect(destinationFor(user.role, formData.get('next')));
 }
 
 export type SignInFields = 'email' | 'password';
@@ -128,7 +149,7 @@ export async function signInAction(
   }
 
   await startSession(user);
-  redirect(safeRedirect(formData.get('next')));
+  redirect(destinationFor(user.role, formData.get('next')));
 }
 
 export async function signOutAction(): Promise<void> {

@@ -45,17 +45,32 @@ export function SiteFooter() {
           </FooterColumn>
         </div>
 
+        {/* "Developed by David ↗" is the same treatment as BazaarKE, furniworld,
+            TaliiKE, SakaKeja and the rest: the portfolio link, not the GitHub
+            profile, and the external-link glyph after the name. */}
         <div className="mt-12 flex flex-col gap-3 border-t border-white/[0.06] pt-6 text-xs text-dark-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} SherehePass. Built in Nairobi.</p>
-          <p>
-            A portfolio project — payments run in sandbox mode, no money moves.{' '}
-            <Link
-              href="/engineering"
-              className="text-dark-300 underline decoration-dark-600 underline-offset-4 transition-colors hover:text-white hover:decoration-primary-400"
+
+          <p className="flex items-center gap-1">
+            Developed by
+            <a
+              href="https://techdave.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-semibold text-dark-300 transition-colors hover:text-white"
             >
-              See how it cannot oversell
-            </Link>
-            .
+              David
+              <svg
+                viewBox="0 0 24 24"
+                className="h-3 w-3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
+                <path d="M7 17L17 7M17 7H7M17 7V17" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
           </p>
         </div>
       </div>

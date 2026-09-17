@@ -60,11 +60,16 @@ export default async function SavedPage() {
       ) : (
         <>
           {live.length > 0 ? (
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {live.map((save) => (
-                <EventCard key={save.event.id} event={save.event} />
-              ))}
-            </div>
+            /* The past section below already has its own h2; without one here
+               the cards' h3 titles hang straight off the h1. */
+            <section className="mt-10">
+              <h2 className="sr-only">Still to come</h2>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {live.map((save) => (
+                  <EventCard key={save.event.id} event={save.event} />
+                ))}
+              </div>
+            </section>
           ) : null}
 
           {over.length > 0 ? (
