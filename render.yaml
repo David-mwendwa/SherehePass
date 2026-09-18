@@ -28,15 +28,22 @@ services:
     #
     # The order here is load-bearing, and not the obvious one:
     #
-    #   1. `npm ci` — also runs `prisma generate` via postinstall, so the
-    #      client exists before anything imports it.
+    #   1. `npm ci --include=dev` — also runs `prisma generate` via
+    #      postinstall, so the client exists before anything imports it.
+    #      `--include=dev` is not optional: NODE_ENV is production below, and
+    #      npm reads that as `--omit=dev`, which drops tailwindcss, postcss
+    #      and autoprefixer. Those are build tools, not runtime ones, so the
+    #      omission looks reasonable right up until the CSS cannot compile.
+    #      The first failure is scripts/check-classes.mjs shelling out to
+    #      `npx tailwindcss`, which, finding nothing installed, tries to
+    #      fetch it from the registry and dies.
     #   2. `prisma migrate deploy` — BEFORE the build, not after. `migrate
     #      deploy` only applies committed migrations and never prompts or
     #      resets, which is what makes it safe to run on every deploy.
     #   3. `npm run build` — needs the database to already be migrated,
     #      because app/sitemap.ts queries it and Next prerenders that route.
     #      Build the app first and it fails on a table that does not exist yet.
-    buildCommand: npm ci && npx prisma migrate deploy && npm run build
+    buildCommand: npm ci --include=dev && npx prisma migrate deploy && npm run build
 
     # `next start`, which reads the PORT Render injects. The npm script passes
     # ${PORT:-3002} so local `npm start` still lands on this project's port.
