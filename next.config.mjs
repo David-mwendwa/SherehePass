@@ -5,17 +5,19 @@ const nextConfig = {
   poweredByHeader: false,
 
   images: {
-    // Event covers are hosted on Unsplash. Narrow rather than a wildcard: an
-    // open image host turns next/image into a free image-resizing proxy for
-    // anyone who can guess the URL format.
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '/**',
-      },
-    ],
-    formats: ['image/avif', 'image/webp'],
+    // Resizing happens at Unsplash, not here — see src/lib/image-loader.ts for
+    // why. The built-in optimizer decoded and re-encoded an already-optimised
+    // CDN image on the web instance, which on a 512MB host got the process
+    // OOM-killed: one image request took the whole server down, so the site
+    // read as intermittently 502 rather than as having an image problem.
+    //
+    // `remotePatterns` and `formats` are deliberately gone rather than left
+    // behind. A custom loader bypasses the optimizer completely, so neither is
+    // read any more, and keeping them would describe a pipeline that no longer
+    // runs. The host allowlist they provided moves into the loader, which
+    // returns anything non-Unsplash untouched.
+    loader: 'custom',
+    loaderFile: './src/lib/image-loader.ts',
   },
 
   /**
