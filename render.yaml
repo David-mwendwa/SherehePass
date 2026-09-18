@@ -15,15 +15,6 @@
 # Every `sync: false` var must be filled in from the Render dashboard on first
 # deploy. `.env.example` documents what each one is for.
 
-databases:
-  - name: sherehepass-db
-    databaseName: sherehepass
-    user: sherehepass
-    plan: free
-    # Closest Render region to Kenya, and it must match the service's region or
-    # every query pays a cross-region round trip.
-    region: frankfurt
-
 services:
   - type: web
     name: sherehepass
@@ -61,11 +52,33 @@ services:
         value: production
 
       # --- Database ---
-      # Wired automatically from the database above; nothing to paste.
+      # Supabase, not a Render-managed instance. Render's free Postgres is
+      # deleted 30 days after creation (plus a 14-day grace period), which for
+      # a demo that is meant to stay up is a countdown, not a plan. TriviaKE
+      # already points its production Postgres at Supabase for the same reason.
+      #
+      # Paste the **session pooler** string:
+      #
+      #   postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+      #
+      # Three connection strings are on offer and only this one works for both
+      # halves of a deploy:
+      #
+      #   * The direct host (db.<ref>.supabase.co:5432) is IPv6-only, and a
+      #     Render service cannot be relied on to reach it.
+      #   * The transaction pooler (port 6543) cannot run the migration.
+      #     `prisma migrate deploy` takes an advisory lock and uses prepared
+      #     statements, neither of which survives transaction pooling — and the
+      #     build runs the migration, so this fails the deploy, not just a
+      #     script.
+      #   * The session pooler (port 5432 on the pooler host) is IPv4 and holds
+      #     a real session, so migrations and the running app both work from
+      #     the one variable. prisma.config.js and src/lib/db.ts read the same
+      #     DATABASE_URL, so one variable is all there is.
+      #
+      # Pick a Supabase region near frankfurt to keep the round trip short.
       - key: DATABASE_URL
-        fromDatabase:
-          name: sherehepass-db
-          property: connectionString
+        sync: false
 
       # --- Auth ---
       # Render generates this once and keeps it. It must not be regenerated on
