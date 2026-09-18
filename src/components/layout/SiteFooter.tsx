@@ -54,7 +54,7 @@ export function SiteFooter() {
           <p className="flex items-center gap-1">
             Developed by
             <a
-              href="https://techdave.netlify.app/"
+              href="https://techdave.dev/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 font-semibold text-dark-300 transition-colors hover:text-white"
