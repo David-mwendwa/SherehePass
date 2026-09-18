@@ -51,6 +51,46 @@ function pickCover(covers, category, seed) {
   return pool[hash % pool.length].url;
 }
 
+/**
+ * Clears orders, which is what makes the seed re-runnable.
+ *
+ * `OrderItem` references `TicketType` *without* a cascade — deliberately, so
+ * that deleting a tier can never quietly delete the record of what someone
+ * paid. That means a second seed run cannot replace the old tiers while last
+ * run's orders still point at them, so the orders have to go first. Deleting
+ * an order does cascade, to its items and its tickets.
+ *
+ * Correct against a development database and catastrophic against a live one,
+ * where an order is somebody's ticket to something they paid for. So the
+ * delete is refused when it would actually destroy rows on a database that is
+ * not local.
+ *
+ * Note what is *not* gated: seeding a fresh deployment. That database is empty,
+ * there is nothing to destroy, and the count check passes without any flag.
+ * Only a re-run against real sales is stopped, which is the case where running
+ * the seed a second time out of habit is the mistake.
+ */
+async function clearOrders() {
+  const existing = await db.order.count();
+  if (existing === 0) return;
+
+  const url = process.env.DATABASE_URL ?? '';
+  const local = /@(localhost|127\.0\.0\.1|host\.docker\.internal)[:/]/.test(url);
+
+  if (!local && process.env.SEED_ALLOW_DESTRUCTIVE !== '1') {
+    const host = url.replace(/\/\/[^@]*@/, '//').split('?')[0];
+    throw new Error(
+      `Refusing to delete ${existing} order(s) on a non-local database.\n\n` +
+        `  ${host}\n\n` +
+        'Every one of those is a ticket somebody holds, and deleting an order\n' +
+        'cascades to its tickets. If you genuinely mean to reset this database,\n' +
+        're-run with SEED_ALLOW_DESTRUCTIVE=1.'
+    );
+  }
+
+  await db.order.deleteMany({});
+}
+
 function at(daysFromNow, hour) {
   const date = new Date();
   date.setDate(date.getDate() + daysFromNow);
@@ -144,13 +184,7 @@ async function main() {
   }
 
   // ----------------------------------------------------------------- events
-  // Orders are cleared first, before ticket types are replaced below.
-  // `OrderItem` references `TicketType` *without* a cascade — deliberately, so
-  // that deleting a tier can never quietly delete the record of what someone
-  // paid — which means a second seed run cannot drop the old tiers while last
-  // run's orders still point at them. Clearing orders (which does cascade to
-  // its items and tickets) is what makes the seed re-runnable.
-  await db.order.deleteMany({});
+  await clearOrders();
 
   const eventBySlug = new Map();
   for (const event of EVENTS) {

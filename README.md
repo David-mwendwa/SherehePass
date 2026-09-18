@@ -60,7 +60,7 @@ so nothing it does touches a real event's sales.
 
 ## Running it
 
-Needs Node 20.9+ and a PostgreSQL instance.
+Needs Node 22+ and a PostgreSQL instance.
 
 ```bash
 npm install
@@ -98,10 +98,77 @@ used one and a pending order — because an empty account demos as broken.
 | `npm test` | The oversell tests — real concurrent transactions |
 | `npm run test:journey` | End-to-end in a real browser (needs `dev` running) |
 | `npm run seed` | Rebuild the catalogue; idempotent, safe to re-run |
+| `npm run db:deploy` | Apply committed migrations (what deploys run) |
+| `npm run check:env` | Fail on env values that would ship wrong (runs in `build`) |
 | `npm run db:migrate` | New migration from schema changes |
 | `npm run db:studio` | Prisma Studio |
 | `npm run covers:fetch` | Re-harvest event cover photos from Unsplash |
 | `npm run check:classes` | Fail on a Tailwind class that does not exist (runs in `build`) |
+
+---
+
+## Deploying
+
+One service, not two. Pages are Server Components that query Postgres directly
+and mutations are Server Actions, so the thing rendering the HTML and the thing
+holding the database connection are the same process — there is no API to split
+off onto its own host. `render.yaml` is a Render blueprint describing that
+service plus the Postgres instance beside it, both in `frankfurt`.
+
+It runs as a long-lived Node process rather than on a serverless platform.
+`src/lib/db.ts` connects through `@prisma/adapter-pg`, which holds a real
+connection pool; one process owns that pool for its lifetime, where serverless
+would open a pool per cold instance and exhaust a small Postgres without a
+pooler in front of it.
+
+Point Render at the repo and it reads the blueprint. `DATABASE_URL` is wired
+from the database automatically and `JWT_SECRET` is generated once — neither
+needs pasting. Everything else has a working default.
+
+**The build order is deliberate**, and not the obvious one:
+
+```
+npm ci                    # postinstall runs `prisma generate`
+npx prisma migrate deploy  # BEFORE the build, not after
+npm run build
+```
+
+`app/sitemap.ts` queries the database and Next prerenders it, so the build
+needs a schema that already exists. Build first and it fails on a missing
+table. `migrate deploy` only applies committed migrations and never prompts or
+resets, which is what makes it safe on every deploy.
+
+`npm run build` starts with `scripts/check-env.mjs`, which fails a deploy build
+on values that would ship wrong: a localhost or non-https site URL, a missing
+database, a `JWT_SECRET` that is short or still a placeholder, or a payment
+gateway key (see below). Locally the same problems print as notes and never
+block.
+
+### After the first deploy
+
+The database comes up empty, and an events site with no events reads as broken
+rather than new:
+
+```bash
+npm run seed
+```
+
+`npm run seed` clears orders before replacing ticket tiers, which is right
+locally and destructive against real sales. It refuses to delete orders on a
+non-local database unless `SEED_ALLOW_DESTRUCTIVE=1` is set. A first deploy is
+unaffected: an empty database has nothing to destroy, so no flag is needed.
+
+### Two things that will bite
+
+**Do not set `STRIPE_SECRET_KEY` or `MPESA_CONSUMER_KEY`.** No live gateway is
+implemented. Setting either does not switch payments on — it switches off the
+simulated callback, so every order is created and then never settles, no ticket
+is ever minted, and checkout appears to work while doing nothing. The build
+refuses to run with either present.
+
+**Free-plan services sleep.** The first request after idle pays a cold start.
+Because pages are server-rendered there is no spinner to get stuck on; the
+first response is simply slow.
 
 ---
 

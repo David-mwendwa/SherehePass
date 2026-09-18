@@ -1,0 +1,96 @@
+# Render blueprint for SherehePass.
+#
+# Unlike every other project in this workspace, this is ONE service. There is no
+# Express API and no static frontend to put on Netlify: pages are Server
+# Components that query Postgres directly and mutations are Server Actions, so
+# the thing that renders the HTML and the thing that talks to the database are
+# the same process. Splitting it would mean inventing an API that does not exist.
+#
+# That also drove the choice of host. `src/lib/db.ts` connects through
+# `@prisma/adapter-pg` (node-postgres), which holds a real connection pool. A
+# long-lived Node process owns that pool for its lifetime; a serverless platform
+# would open one per cold instance and exhaust a small Postgres without a
+# pgbouncer in front of it.
+#
+# Every `sync: false` var must be filled in from the Render dashboard on first
+# deploy. `.env.example` documents what each one is for.
+
+databases:
+  - name: sherehepass-db
+    databaseName: sherehepass
+    user: sherehepass
+    plan: free
+    # Closest Render region to Kenya, and it must match the service's region or
+    # every query pays a cross-region round trip.
+    region: frankfurt
+
+services:
+  - type: web
+    name: sherehepass
+    runtime: node
+    plan: free
+    region: frankfurt
+
+    # Node version comes from .nvmrc (22). Do not let the host pick: the
+    # lockfile is resolved against npm 10, and a different major resolves a
+    # different tree.
+    #
+    # The order here is load-bearing, and not the obvious one:
+    #
+    #   1. `npm ci` — also runs `prisma generate` via postinstall, so the
+    #      client exists before anything imports it.
+    #   2. `prisma migrate deploy` — BEFORE the build, not after. `migrate
+    #      deploy` only applies committed migrations and never prompts or
+    #      resets, which is what makes it safe to run on every deploy.
+    #   3. `npm run build` — needs the database to already be migrated,
+    #      because app/sitemap.ts queries it and Next prerenders that route.
+    #      Build the app first and it fails on a table that does not exist yet.
+    buildCommand: npm ci && npx prisma migrate deploy && npm run build
+
+    # `next start`, which reads the PORT Render injects. The npm script passes
+    # ${PORT:-3002} so local `npm start` still lands on this project's port.
+    startCommand: npm start
+
+    # A route handler that runs `SELECT 1`. Pointed at `/` this would run the
+    # home page's three queries on every probe.
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # --- Database ---
+      # Wired automatically from the database above; nothing to paste.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sherehepass-db
+          property: connectionString
+
+      # --- Auth ---
+      # Render generates this once and keeps it. It must not be regenerated on
+      # a later deploy: the secret signs session cookies, so changing it signs
+      # everyone out at once.
+      - key: JWT_SECRET
+        generateValue: true
+
+      # --- Public URL ---
+      # Optional. Render sets RENDER_EXTERNAL_URL itself and lib/seo.ts falls
+      # back to it, so a first deploy works before this service has a name you
+      # could have typed here. Set it explicitly once a custom domain is added,
+      # because RENDER_EXTERNAL_URL keeps naming the onrender.com host and
+      # every canonical would go on pointing at it.
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+
+      # --- Payments ---
+      # Deliberately absent: STRIPE_SECRET_KEY and MPESA_CONSUMER_KEY. No live
+      # gateway is implemented, and setting either one does not enable real
+      # payments — it only stops the simulated callback being scheduled, which
+      # leaves every order unpaid and mints no tickets. scripts/check-env.mjs
+      # fails the build if one is present.
+      #
+      # How often a simulated payment fails, so the release path that returns
+      # unsold stock actually runs. Default is 0.125 if unset.
+      - key: PAYMENT_FAILURE_RATE
+        value: "0.125"

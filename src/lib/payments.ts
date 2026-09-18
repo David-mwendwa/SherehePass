@@ -34,7 +34,16 @@ const SIMULATED_DELAY_MS = 2500;
  */
 const FAILURE_RATE = Number(process.env.PAYMENT_FAILURE_RATE ?? 0.125);
 
-/** Whether a real gateway is configured. Neither is, in this build. */
+/**
+ * Whether a real gateway is configured. Neither is, in this build.
+ *
+ * Note what "live" costs while that remains true: the only behaviour keyed off
+ * it is whether the simulated callback gets scheduled, so setting either key
+ * does not switch on a real payment, it switches off the only thing that ever
+ * settles an order. `scripts/check-env.mjs` refuses a deploy build with either
+ * key present for exactly that reason. Whoever implements the live path should
+ * delete that rule in the same change.
+ */
 export function gatewayMode(): 'live' | 'simulated' {
   return process.env.MPESA_CONSUMER_KEY || process.env.STRIPE_SECRET_KEY
     ? 'live'

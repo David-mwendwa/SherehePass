@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/Toaster';
 import { getCurrentUser } from '@/lib/auth';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { SiteHeader } from '@/components/layout/SiteHeader';
+import { SITE_URL } from '@/lib/seo';
 
 import './globals.css';
 
@@ -34,7 +35,10 @@ const bricolage = Bricolage_Grotesque({
   weight: ['600', '700', '800'],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3002';
+// One definition, shared with the sitemap, robots and every JSON-LD graph.
+// Two copies of "what is this site's URL" is the same drift trap as two copies
+// of the page title: both look right in isolation and disagree in production.
+const siteUrl = SITE_URL;
 
 export const metadata = {
   metadataBase: new URL(siteUrl),

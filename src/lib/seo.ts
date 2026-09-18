@@ -11,8 +11,24 @@ import type { EventDetail } from '@/lib/events';
 
 export const SITE_NAME = 'SherehePass';
 
+/**
+ * The site's own origin, defined once.
+ *
+ * `NEXT_PUBLIC_SITE_URL` is the explicit answer and always wins.
+ * `RENDER_EXTERNAL_URL` is the bootstrap: Render only knows a service's URL
+ * once the service exists, so a first deploy would otherwise have to fail,
+ * have the URL pasted in, and be run again. It is a plain server variable
+ * rather than a `NEXT_PUBLIC_` one, which is fine because nothing in this
+ * module is imported by a client component — check before adding one.
+ *
+ * The localhost fallback is for local development only. Shipping it would put
+ * a canonical on every page naming a machine no crawler can reach, so
+ * scripts/check-env.mjs fails a deploy build that reaches this far.
+ */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3002'
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.RENDER_EXTERNAL_URL ??
+  'http://localhost:3002'
 ).replace(/\/$/, '');
 
 export const DEFAULT_DESCRIPTION =
