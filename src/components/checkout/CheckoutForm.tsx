@@ -130,7 +130,7 @@ export function CheckoutForm({
           )}
 
           <p className="mt-5 border-t border-white/[0.06] pt-4 text-xs text-dark-500">
-            Payments are simulated — no money moves, and no card or M-Pesa
+            Payments are simulated. No money moves, and no card or M-Pesa
             credentials are ever collected.
           </p>
         </section>

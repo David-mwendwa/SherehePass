@@ -157,7 +157,7 @@ function EmptyResults() {
       className="mt-10"
       icon={SearchX}
       title="No events match"
-      description="Try widening the date range, or clearing the county filter — most events are in Nairobi, but not all of them."
+      description="Try widening the date range, or clearing the county filter. Most events are in Nairobi, but not all of them."
       action={
         <Button href="/events" variant="secondary">
           Clear all filters

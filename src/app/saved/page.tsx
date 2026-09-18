@@ -46,7 +46,7 @@ export default async function SavedPage() {
     <div className="container py-10 sm:py-14">
       <h1 className="font-heading text-title">Saved</h1>
       <p className="mt-2 text-dark-400">
-        Things you bookmarked. Nothing is held for you — saving is not buying.
+        Things you bookmarked. Saving is not buying, so nothing is held for you.
       </p>
 
       {saves.length === 0 ? (

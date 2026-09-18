@@ -11,7 +11,7 @@ export const metadata = {
 const POINTS = [
   {
     title: 'Tiers that cannot oversell',
-    body: 'Early bird, regular, VIP — each with its own price and cap. Two people buying the last ticket at the same instant is handled in the database, not hoped about.',
+    body: 'Early bird, regular, VIP, each with its own price and cap. Two people buying the last ticket at the same instant is handled in the database, not hoped about.',
   },
   {
     title: 'A door that works offline-ish',
@@ -19,7 +19,7 @@ const POINTS = [
   },
   {
     title: 'Money you can see',
-    body: 'Revenue counts paid orders only — never pending ones — so the number on your dashboard is money that has actually arrived.',
+    body: 'Revenue counts paid orders only, never pending ones, so the number on your dashboard is money that has actually arrived.',
   },
 ];
 

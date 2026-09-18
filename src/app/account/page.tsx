@@ -67,7 +67,7 @@ export default async function AccountPage() {
           <div className="max-w-sm">
             <p className="font-medium text-white">Putting on an event?</p>
             <p className="mt-1 text-sm text-dark-400">
-              Organiser accounts are set up by hand in this build — the seeded
+              Organiser accounts are set up by hand in this build. The seeded
               organiser login is on the sign-in page.
             </p>
           </div>

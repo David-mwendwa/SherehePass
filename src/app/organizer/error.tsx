@@ -29,8 +29,8 @@ export default function OrganizerError({
         <p className="eyebrow text-danger-400">Dashboard error</p>
         <h1 className="mt-3 text-section">Could not load that</h1>
         <p className="mt-3 text-sm leading-relaxed text-dark-400">
-          Your events and sales are safe — this is the page failing to read
-          them, not the data going missing.
+          Your events and sales are safe. This is the page failing to read them,
+          not the data going missing.
         </p>
         {error?.digest ? (
           <p className="mt-4 font-mono text-xs text-dark-600">

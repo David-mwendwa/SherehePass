@@ -8,7 +8,7 @@ const SECTIONS = [
   {
     heading: 'Buying a ticket',
     body: [
-      'Pick your tier and quantity on the event page, then check out. The price you see is the price you pay — there is no booking fee added at the last step, and VAT is already in the number.',
+      'Pick your tier and quantity on the event page, then check out. The price you see is the price you pay. There is no booking fee added at the last step, and VAT is already in the number.',
       'Your tickets are held from the moment you press pay, not from the moment payment lands. If the payment then fails, they go straight back on sale.',
     ],
   },
@@ -23,7 +23,7 @@ const SECTIONS = [
     heading: 'Getting in',
     body: [
       'Every ticket has its own QR code, one per person admitted. Open My tickets, show the code, and it is scanned at the gate.',
-      'A code works exactly once. If someone scans a screenshot of your ticket before you arrive, yours will be refused — so do not share the image.',
+      'A code works exactly once. If someone scans a screenshot of your ticket before you arrive, yours will be refused, so do not share the image.',
     ],
   },
   {

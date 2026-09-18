@@ -17,7 +17,7 @@ export function SiteFooter() {
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-dark-400">
-              Tickets for the things worth leaving the house for — across Nairobi,
+              Tickets for the things worth leaving the house for, across Nairobi,
               the coast, the Rift and everywhere in between.
             </p>
           </div>

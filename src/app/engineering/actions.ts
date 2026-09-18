@@ -39,7 +39,7 @@ export async function runDemoAction(
 ): Promise<DemoState> {
   const now = Date.now();
   if (now - lastRunAt < COOLDOWN_MS) {
-    return { error: 'One run at a time — give it a second.' };
+    return { error: 'One run at a time. Give it a second.' };
   }
   lastRunAt = now;
 

@@ -233,7 +233,7 @@ export default async function HomePage() {
                 icon={Ticket}
                 n="01"
                 title="Pick your tier"
-                body="Early bird, regular, VIP. Prices are in KES and what you see is what you pay — no fee revealed at the last step."
+                body="Early bird, regular, VIP. Prices are in KES and what you see is what you pay. No fee is revealed at the last step."
               />
               <Step
                 icon={Smartphone}

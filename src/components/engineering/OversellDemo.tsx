@@ -96,7 +96,7 @@ export function OversellDemo({ limits }: OversellDemoProps) {
           <Result run={state.run} />
         ) : state.error ? null : (
           <p className="py-6 text-center text-sm text-dark-500">
-            Press run. Nothing is precomputed — this opens real transactions
+            Press run. Nothing is precomputed: this opens real transactions
             against a sandbox ticket tier.
           </p>
         )}
@@ -205,7 +205,7 @@ function Result({ run }: { run: NonNullable<DemoState['run']> }) {
           >
             {run.held
               ? `${run.attempts} buyers, ${run.capacity} tickets, ${run.finalSold} sold.`
-              : `Invariant broken — ${oversold} ticket${oversold === 1 ? '' : 's'} oversold.`}
+              : `Invariant broken: ${oversold} ticket${oversold === 1 ? '' : 's'} oversold.`}
           </p>
           <p className="mt-1 text-sm text-dark-300">
             {run.held
@@ -230,7 +230,7 @@ function Result({ run }: { run: NonNullable<DemoState['run']> }) {
       </ol>
 
       <p className="mt-4 text-xs leading-relaxed text-dark-500">
-        Refused transactions are not errors — they are the guarantee working.
+        Refused transactions are not errors. They are the guarantee working.
         Each one rolled back in full, so no order, no ticket and no counter
         movement survived it.
       </p>

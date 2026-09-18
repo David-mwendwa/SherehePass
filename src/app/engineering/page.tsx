@@ -73,7 +73,7 @@ if (tier.sold + 1 <= tier.quantity) {   // both read sold: 199, quantity: 200
             where the second request slips in. It is a few milliseconds wide,
             which is why it never shows up in development and always shows up on
             the night a popular event goes on sale. Wrapping it in a transaction
-            does not close it either — at Postgres&rsquo;s default isolation
+            does not close it either. At Postgres&rsquo;s default isolation
             level both transactions read the same committed value and both write
             happily on top of it.
           </p>
@@ -111,7 +111,7 @@ UPDATE "TicketType"
             Postgres takes a row lock for the duration of that statement, so
             concurrent buyers queue behind each other instead of racing. The one
             that arrives after the stock is gone matches{' '}
-            <strong className="text-white">zero rows</strong> — and zero rows
+            <strong className="text-white">zero rows</strong>, and zero rows
             updated is how the application learns it lost, rolls its transaction
             back, and tells that buyer the tier sold out.
           </p>
@@ -139,7 +139,7 @@ export async function claimStock(tx, tier, quantity) {
             <code>updateMany</code> rather than <code>update</code> is the whole
             point: it compiles to <code>UPDATE … WHERE</code> and reports how
             many rows matched. <code>update</code> takes a unique id, finds the
-            row, and writes — which is the three-step version again, wearing a
+            row, and writes, which is the three-step version again, wearing a
             different name.
           </p>
           <p>
@@ -163,7 +163,7 @@ export async function claimStock(tx, tier, quantity) {
 
           <CodeBlock
             language="sql"
-            caption="prisma/migrations — oversell_guards"
+            caption="prisma/migrations/oversell_guards"
             code={`
 ALTER TABLE "TicketType"
   ADD CONSTRAINT "TicketType_sold_within_quantity"
@@ -189,7 +189,7 @@ ALTER TABLE "TicketType"
           <p>
             Claims about concurrency are cheap. Below, a sandbox ticket tier is
             reset to a known capacity and then attacked by as many simultaneous
-            transactions as you ask for — each one calling the same{' '}
+            transactions as you ask for, each one calling the same{' '}
             <code>claimStock</code> shown above, in the same kind of transaction
             the checkout uses.
           </p>
@@ -211,12 +211,12 @@ ALTER TABLE "TicketType"
 
         <footer className="mt-16 border-t border-white/[0.06] pt-8">
           <p className="text-sm text-dark-400">
-            The rest of the reasoning — why the money is stored as integer cents,
-            why <code>OrderItem</code> snapshots its price, why tickets are
-            minted on payment rather than at checkout — is in the header comments
-            of{' '}
+            The rest of the reasoning is in the header comments of{' '}
             <code className="text-dark-300">prisma/schema.prisma</code> and{' '}
-            <code className="text-dark-300">src/lib/purchase.ts</code>.
+            <code className="text-dark-300">src/lib/purchase.ts</code>: why the
+            money is stored as integer cents, why <code>OrderItem</code>{' '}
+            snapshots its price, and why tickets are minted on payment rather
+            than at checkout.
           </p>
           <p className="mt-4 text-sm text-dark-400">
             <Link

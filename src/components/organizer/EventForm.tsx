@@ -97,7 +97,7 @@ export function EventForm({ event, venues }: EventFormProps) {
           defaultValue={event?.description}
           required
           rows={10}
-          hint="Blank lines become paragraphs. Plain text only — no HTML."
+          hint="Blank lines become paragraphs. Plain text only, no HTML."
           error={errors.description?.[0]}
         />
         <Input
@@ -132,7 +132,7 @@ export function EventForm({ event, venues }: EventFormProps) {
             <option value="">Choose a venue…</option>
             {venues.map((venue) => (
               <option key={venue.id} value={venue.id}>
-                {venue.name} — {venue.county}
+                {venue.name}, {venue.county}
               </option>
             ))}
           </Select>

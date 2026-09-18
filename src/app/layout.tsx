@@ -39,7 +39,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3002';
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'SherehePass — live events in Kenya',
+    default: 'SherehePass: live events in Kenya',
     // Every page sets only its own name; the suffix is applied here so it
     // cannot drift between routes.
     template: '%s · SherehePass',
@@ -57,13 +57,13 @@ export const metadata = {
     locale: 'en_KE',
     url: siteUrl,
     siteName: 'SherehePass',
-    title: 'SherehePass — live events in Kenya',
+    title: 'SherehePass: live events in Kenya',
     description:
       'Find concerts, festivals, tech meetups and match days across Kenya, and buy the ticket in the same breath.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SherehePass — live events in Kenya',
+    title: 'SherehePass: live events in Kenya',
     description:
       'Find concerts, festivals, tech meetups and match days across Kenya, and buy the ticket in the same breath.',
   },

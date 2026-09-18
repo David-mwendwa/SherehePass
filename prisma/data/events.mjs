@@ -38,7 +38,7 @@ export const ORGANIZERS = [
   {
     slug: 'jiko-la-jiji',
     name: 'Jiko la Jiji',
-    bio: 'Food events built around Kenyan producers — night markets, chef residencies and long tables.',
+    bio: 'Food events built around Kenyan producers: night markets, chef residencies and long tables.',
     website: null,
     verified: false,
     user: { name: 'Kevin Mutiso', email: 'kevin@jikolajiji.ke' },
@@ -114,7 +114,7 @@ export const EVENTS = [
 
 Doors at 4pm, first set at 5. The bill runs through Afro-fusion, a benga revival act, and a closing DJ set that has historically gone until the neighbours complain. Full bar, three food stalls, and a shaded seating deck for anyone who would rather sit down.
 
-Bring ID — over 21s only. The venue is a ten-minute walk from Sarit Centre and there is paid parking on site.`,
+Bring ID. Over 21s only. The venue is a ten-minute walk from Sarit Centre and there is paid parking on site.`,
     daysFromNow: 9,
     durationHours: 8,
     startHour: 16,
@@ -129,7 +129,7 @@ Bring ID — over 21s only. The venue is a ten-minute walk from Sarit Centre and
     venue: 'Kenya National Theatre',
     category: 'MUSIC',
     summary:
-      'Four bands, one night, and a genre that never actually went away — played the way it was recorded in 1974.',
+      'Four bands, one night, and a genre that never actually went away, played the way it was recorded in 1974.',
     description: `A seated show, deliberately. Benga was written for dancing but it was arranged for listening, and this line-up plays it note for note off the original pressings.
 
 Two sets with an interval. The bar stays open throughout, and there is a record stall in the foyer selling reissues.`,
@@ -167,7 +167,7 @@ This is the one that sells out, so the Early Bird tier is genuinely limited rath
       'Two days on the sand at Diani, with the main stage facing the water and the last set finishing at sunrise.',
     description: `Now in its seventh year. Two stages, twenty-eight acts, and a beach that stays open through the night.
 
-Weekend passes include in-and-out access, so you can go back to your hotel and return. Camping is available separately through the festival site — this ticket does not include it.
+Weekend passes include in-and-out access, so you can go back to your hotel and return. Camping is available separately through the festival site. This ticket does not include it.
 
 Getting there: fly into Ukunda, or take the Likoni ferry and drive 45 minutes south.`,
     daysFromNow: 38,
@@ -206,7 +206,7 @@ There are no cars on Lamu. Everything is walkable, and everything is close.`,
       'A one-day festival on the shore at Naivasha, ninety minutes from Nairobi and worth every one of them.',
     description: `One stage, eight acts, from midday until midnight, on the grass between the lodge and the water.
 
-Day tickets only — there is no camping. Shuttles run from Nairobi CBD and are booked separately.`,
+Day tickets only. There is no camping. Shuttles run from Nairobi CBD and are booked separately.`,
     daysFromNow: 16,
     durationHours: 12,
     startHour: 12,
@@ -260,7 +260,7 @@ Student tickets are heavily subsidised and cover the same access as an individua
     venue: 'Kisumu Impala Sanctuary',
     category: 'TECH',
     summary:
-      'The lakeside edition — a two-day unconference where the schedule is written on the morning of day one.',
+      'The lakeside edition: a two-day unconference where the schedule is written on the morning of day one.',
     description: `No fixed programme. Everyone who turns up can propose a session, the room votes, and the grid is filled in before the first coffee break.
 
 It works better than it sounds, and it has run for three years.`,
@@ -317,7 +317,7 @@ You will run past wildlife. Rangers are stationed along the route and the briefi
     category: 'SPORTS',
     summary:
       'The one fixture that fills Nyayo. Gates at 1pm for a 4pm kick-off, and yes, you should get there early.',
-    description: `All-seated. Home and away ends are separated and tickets are sold by stand — pick the right one.
+    description: `All-seated. Home and away ends are separated and tickets are sold by stand, so pick the right one.
 
 No glass, no flares, no umbrellas. The stadium is on the Langata Road side and matchday traffic starts building around midday.`,
     daysFromNow: 19,
@@ -341,7 +341,7 @@ No glass, no flares, no umbrellas. The stadium is on the Langata Road side and m
       'Forty stalls, one long table, and a rule that every vendor must source at least half their produce within 100km.',
     description: `A night market on the racecourse grass. Forty food stalls, a bar, and live music that stays quiet enough to talk over.
 
-Entry is cheap on purpose — you are paying the vendors, not us. Cash and M-Pesa both work at every stall.`,
+Entry is cheap on purpose. You are paying the vendors, not us. Cash and M-Pesa both work at every stall.`,
     daysFromNow: 12,
     durationHours: 7,
     startHour: 17,
@@ -357,7 +357,7 @@ Entry is cheap on purpose — you are paying the vendors, not us. Cash and M-Pes
       'One table, sixty seats, six courses, and a menu written the week before from whatever the farms had.',
     description: `A single seating. Everyone eats the same thing at the same time, and the menu is not published in advance because it depends on what is ready.
 
-Dietary requirements are handled — tell us when you book. Wine pairing is included.`,
+Dietary requirements are handled. Tell us when you book. Wine pairing is included.`,
     daysFromNow: 26,
     durationHours: 4,
     startHour: 18,
@@ -373,7 +373,7 @@ Dietary requirements are handled — tell us when you book. Wine pairing is incl
       'A three-hour walk through Mombasa Old Town, stopping at seven places you would not find alone.',
     description: `Starts at Fort Jesus, finishes at the harbour. Seven stops, all of them family-run, most of them older than everyone on the walk.
 
-Small groups — twenty people maximum per crawl, which is why it sells out. Comfortable shoes; the streets are cobbled and narrow.`,
+Small groups of twenty people maximum per crawl, which is why it sells out. Comfortable shoes; the streets are cobbled and narrow.`,
     daysFromNow: 41,
     durationHours: 3,
     startHour: 17,
@@ -393,7 +393,7 @@ Small groups — twenty people maximum per crawl, which is why it sells out. Com
       'Spoken word in the courtyard, twelve slots, and a sign-up sheet that opens an hour before the first reader.',
     description: `Twelve slots of five minutes each, drawn at random from whoever signs up on the night. Two featured poets close the evening.
 
-Free to watch, free to read. The ticket is for the headcount — the courtyard holds what it holds.`,
+Free to watch, free to read. The ticket is for the headcount. The courtyard holds what it holds.`,
     daysFromNow: 7,
     durationHours: 3,
     startHour: 18,
@@ -421,7 +421,7 @@ Everything is for sale and every price is on the label, because a gallery that m
   },
   {
     slug: 'kilele-theatre-mashetani',
-    title: 'Mashetani — a new staging',
+    title: 'Mashetani: a new staging',
     organizer: 'kilele-arts',
     venue: 'Kenya National Theatre',
     category: 'ARTS',
@@ -429,7 +429,7 @@ Everything is for sale and every price is on the label, because a gallery that m
       'Ebrahim Hussein’s play, staged in the round, running six nights with no interval.',
     description: `Staged in the round with the audience on all four sides. Ninety minutes, no interval.
 
-Performed in Kiswahili with English surtitles. Latecomers cannot be seated once the play has begun — the entrances are through the audience.`,
+Performed in Kiswahili with English surtitles. Latecomers cannot be seated once the play has begun, because the entrances are through the audience.`,
     daysFromNow: 35,
     durationHours: 2,
     startHour: 19,
@@ -499,7 +499,7 @@ Children are welcome with an adult. We finish at 11 and there is lunch for every
     category: 'COMMUNITY',
     summary:
       'An hour on the grass above the channel, starting in the dark and finishing in full sun.',
-    description: `Every Saturday, 6am, on the lawn at Mama Ngina. All levels — the instruction is genuinely for beginners and the regulars have been coming for two years.
+    description: `Every Saturday, 6am, on the lawn at Mama Ngina. All levels. The instruction is genuinely for beginners and the regulars have been coming for two years.
 
 Bring a mat or a towel. There is nowhere to store bags, so travel light.`,
     daysFromNow: 3,
@@ -547,7 +547,7 @@ Readings run on the hour on the small stage. Entry covers the day and you can co
   },
   {
     slug: 'nairobi-devs-monthly-february',
-    title: 'Nairobi Devs Monthly — February',
+    title: 'Nairobi Devs Monthly: February',
     organizer: 'nairobi-devs',
     venue: 'iHub',
     category: 'TECH',
