@@ -24,10 +24,17 @@ export const SITE_NAME = 'SherehePass';
  * The localhost fallback is for local development only. Shipping it would put
  * a canonical on every page naming a machine no crawler can reach, so
  * scripts/check-env.mjs fails a deploy build that reaches this far.
+ *
+ * `||` rather than `??`, and it matters: a blueprint's optional variable left
+ * blank in the host's UI arrives as an empty string, not as unset. `??` treats
+ * `''` as a real answer and every canonical becomes the empty string, while
+ * check-env.mjs — which uses `||` — sees the fallback and reports the build
+ * healthy. The two must agree or the check is worse than none, because it
+ * certifies the exact failure it exists to catch.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  process.env.RENDER_EXTERNAL_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.RENDER_EXTERNAL_URL ||
   'http://localhost:3002'
 ).replace(/\/$/, '');
 
