@@ -167,25 +167,45 @@ export function EventCard({
           {event.summary}
         </p>
 
-        <div
-          className={cn(
-            'mt-auto flex items-center gap-3 text-sm',
-            feature ? 'pt-2' : 'pt-1'
-          )}
-        >
-          <span className="flex min-w-0 items-center gap-1.5 text-dark-400">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{event.venue.name}</span>
-          </span>
-          <span
-            className={cn(
-              'ml-auto shrink-0 font-mono text-sm font-medium',
-              soldOut ? 'text-dark-500' : 'text-secondary-300'
-            )}
-          >
-            {soldOut ? '—' : price}
-          </span>
-        </div>
+        {/*
+          The feature row is wide enough to carry venue and price on one line.
+          The grid card is not: "From Ksh 4,000" and a venue competing for
+          about 240px truncated real places down to "Hell's Gate Nationa…" and
+          "Kenya National The…", which is the part of the card that answers
+          "can I get there". Stacking gives the venue the full width, and puts
+          the number people are actually comparing on a line of its own.
+        */}
+        {feature ? (
+          <div className="mt-auto flex items-center gap-3 pt-2 text-sm">
+            <span className="flex min-w-0 items-center gap-1.5 text-dark-400">
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="truncate">{event.venue.name}</span>
+            </span>
+            <span
+              className={cn(
+                'ml-auto shrink-0 font-mono text-sm font-medium',
+                soldOut ? 'text-dark-500' : 'text-secondary-300'
+              )}
+            >
+              {soldOut ? '—' : price}
+            </span>
+          </div>
+        ) : (
+          <div className="mt-auto space-y-1 border-t border-white/[0.06] pt-3">
+            <p
+              className={cn(
+                'font-mono text-sm font-medium',
+                soldOut ? 'text-dark-500' : 'text-secondary-300'
+              )}
+            >
+              {soldOut ? 'Sold out' : price}
+            </p>
+            <p className="flex items-center gap-1.5 text-xs text-dark-400">
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="truncate">{event.venue.name}</span>
+            </p>
+          </div>
+        )}
       </div>
     </Link>
   );

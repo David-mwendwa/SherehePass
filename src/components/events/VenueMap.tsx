@@ -41,7 +41,7 @@ export function VenueMap({ venue }: VenueMapProps) {
         src={src}
         title={`Map showing ${name}`}
         loading="lazy"
-        className="h-64 w-full border-0"
+        className="map-dark h-64 w-full border-0"
         // The embed is a third-party document; give it nothing it does not need.
         referrerPolicy="no-referrer-when-downgrade"
       />

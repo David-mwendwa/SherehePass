@@ -11,6 +11,7 @@ import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { EventCard } from '@/components/events/EventCard';
+import { EventRail, EventRailItem } from '@/components/events/EventRail';
 import { SearchBar } from '@/components/events/SearchBar';
 import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/lib/format';
 import {
@@ -40,7 +41,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   // The layout's title template appends the brand to every page name, so the
   // home page has to opt out of it or it reads "SherehePass · SherehePass".
-  title: { absolute: 'SherehePass — live events in Kenya' },
+  title: { absolute: 'SherehePass: live events in Kenya' },
   description: DEFAULT_DESCRIPTION,
   alternates: { canonical: '/' },
 };
@@ -63,6 +64,11 @@ export default async function HomePage() {
 
   const totalUpcoming = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
+  // The first featured event is the hero's card; the rest stay in the section
+  // below. Deduping happens here rather than by excluding an id downstream,
+  // because `featuredIds` still has to cover all three for the sections after.
+  const [heroEvent, ...restFeatured] = featured;
+
   return (
     <>
       {/*
@@ -79,55 +85,82 @@ export default async function HomePage() {
       />
 
       {/* ------------------------------------------------------------ hero */}
+      {/*
+        Two columns from `lg`. Left-aligned copy capped at `max-w-3xl` left the
+        right half of a 1440px window empty, and the first event on the page sat
+        below the fold — on a site whose entire job is to show people what is
+        on. The top featured event moves up into that space and comes out of
+        the Featured section below, so nothing is listed twice.
+      */}
       <section className="relative overflow-hidden">
         <div className="bloom" />
-        <div className="container relative py-20 sm:py-28">
-          <div className="max-w-3xl">
-            <p className="eyebrow mb-5 flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-500 opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-500" />
-              </span>
-              {/* Counted from the database, never written down — the number
-                  changes every time an organiser publishes. */}
-              {totalUpcoming} events on sale across Kenya
-            </p>
+        <div className="container relative py-14 sm:py-20">
+          <div className="grid items-center gap-12 lg:grid-cols-[1fr_24rem] xl:gap-16">
+            <div className="max-w-2xl">
+              <p className="eyebrow mb-5 flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-500 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-500" />
+                </span>
+                {/* Counted from the database, never written down — the number
+                    changes every time an organiser publishes. */}
+                {totalUpcoming} events on sale across Kenya
+              </p>
 
-            <h1 className="font-heading text-display text-white">
-              Find the night.
-              <br />
-              <span className="text-primary-400">Keep the ticket.</span>
-            </h1>
+              <h1 className="font-heading text-display text-white">
+                Find the night.
+                <br />
+                <span className="text-primary-400">Keep the ticket.</span>
+              </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-dark-300">
-              Concerts, festivals, meetups and match days from Nairobi to Lamu.
-              Pay with M-Pesa, and walk in with a QR code on your phone.
-            </p>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-dark-300">
+                Concerts, festivals, meetups and match days from Nairobi to
+                Lamu. Pay with M-Pesa, and walk in with a QR code on your phone.
+              </p>
 
-            <div className="mt-9 max-w-xl">
-              <SearchBar />
+              <div className="mt-8 max-w-xl">
+                <SearchBar />
+              </div>
+
+              {/* One scrolling line rather than a wrapping block. Wrapped, the
+                  set broke across three rows in the narrower column and left a
+                  single chip stranded on the last one; the same treatment is
+                  already used by the filter chips on /events. */}
+              <div className="edge-fade no-scrollbar -mx-1 mt-6 flex gap-2 overflow-x-auto px-1 pb-1">
+                {CATEGORY_ORDER.filter((key) => categoryCounts[key]).map(
+                  (key) => (
+                    <Link
+                      key={key}
+                      href={`/events?category=${key}`}
+                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-sm text-dark-300 transition-colors hover:border-primary-500/40 hover:bg-primary-500/10 hover:text-white"
+                    >
+                      {CATEGORY_LABELS[key]}
+                      <span className="ml-1.5 font-mono text-xs text-dark-500">
+                        {categoryCounts[key]}
+                      </span>
+                    </Link>
+                  )
+                )}
+              </div>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              {CATEGORY_ORDER.filter((key) => categoryCounts[key]).map((key) => (
-                <Link
-                  key={key}
-                  href={`/events?category=${key}`}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-sm text-dark-300 transition-colors hover:border-primary-500/40 hover:bg-primary-500/10 hover:text-white"
-                >
-                  {CATEGORY_LABELS[key]}
-                  <span className="ml-1.5 font-mono text-xs text-dark-500">
-                    {categoryCounts[key]}
-                  </span>
-                </Link>
-              ))}
-            </div>
+            {heroEvent ? (
+              <div>
+                <div className="eyebrow mb-3 flex items-center gap-1.5">
+                  <Flame className="h-3.5 w-3.5 text-primary-400" />
+                  {/* Not "tonight" — this is whichever event is flagged
+                      featured, and it is regularly weeks out. */}
+                  Featured
+                </div>
+                <EventCard event={heroEvent} priority />
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
 
       {/* -------------------------------------------------------- featured */}
-      {featured.length > 0 ? (
+      {restFeatured.length > 0 ? (
         <section className="container pb-4">
           <SectionHeading
             eyebrow="Featured"
@@ -136,13 +169,8 @@ export default async function HomePage() {
             linkLabel="All events"
           />
           <div className="mt-8 space-y-5">
-            {featured.map((event, index) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                variant="feature"
-                priority={index === 0}
-              />
+            {restFeatured.map((event) => (
+              <EventCard key={event.id} event={event} variant="feature" />
             ))}
           </div>
         </section>
@@ -161,10 +189,14 @@ export default async function HomePage() {
             title="More than 70% gone"
             description="Worked out from the live sold counts, not a hand-picked list."
           />
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {sellingFast.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
+          <div className="mt-8">
+            <EventRail>
+              {sellingFast.map((event) => (
+                <EventRailItem key={event.id}>
+                  <EventCard event={event} />
+                </EventRailItem>
+              ))}
+            </EventRail>
           </div>
         </section>
       ) : null}
@@ -177,10 +209,14 @@ export default async function HomePage() {
           href="/events"
           linkLabel="Browse all"
         />
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {upcoming.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
+        <div className="mt-8">
+          <EventRail>
+            {upcoming.map((event) => (
+              <EventRailItem key={event.id}>
+                <EventCard event={event} />
+              </EventRailItem>
+            ))}
+          </EventRail>
         </div>
       </section>
 

@@ -154,6 +154,12 @@ export default {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        // The mobile navigation drawer, which enters from the edge it is
+        // anchored to rather than rising like a popover.
+        slideInRight: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
@@ -163,6 +169,7 @@ export default {
         'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         float: 'float 4s ease-in-out infinite',
         marquee: 'marquee 40s linear infinite',
+        'slide-in-right': 'slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
         shimmer: 'shimmer 1.6s infinite',
       },
     },

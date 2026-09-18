@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Minus, Plus, Ticket } from 'lucide-react';
+import { CalendarX2, Minus, Plus, Ticket } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import type { TicketType } from '@prisma/client';
@@ -27,6 +27,8 @@ export type TicketPickerProps = {
   ticketTypes: TicketType[];
   disabled: boolean;
   disabledReason: string;
+  /** Where "find another" goes when this event can no longer be bought. */
+  browseHref: string;
   signedIn: boolean;
 };
 
@@ -35,6 +37,7 @@ export function TicketPicker({
   ticketTypes,
   disabled,
   disabledReason,
+  browseHref,
   signedIn,
 }: TicketPickerProps) {
   const router = useRouter();
@@ -89,8 +92,42 @@ export function TicketPicker({
     );
   }
 
+  /*
+   * An event that has finished or been cancelled gets a statement, not a
+   * disabled shop.
+   *
+   * Rendering the tier list with dimmed steppers and the reason underneath
+   * puts the answer to "can I buy this" below every control implying you can,
+   * and dimmed is a weak signal at the best of times — on a phone the whole
+   * panel is below the fold, so the prices arrive first and the sentence that
+   * makes sense of them arrives last. Saying it once, at full contrast, and
+   * offering the thing someone actually wants next is shorter and truer.
+   */
+  if (disabled) {
+    return (
+      <div id="tickets" className="surface p-6 text-center">
+        <span className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] text-dark-300">
+          <CalendarX2 className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <h2 className="font-heading text-subhead text-white">
+          {disabledReason}
+        </h2>
+        <p className="mx-auto mt-2 max-w-[24ch] text-sm leading-relaxed text-dark-400">
+          Tickets are no longer on sale for this one.
+        </p>
+        <Button
+          href={browseHref}
+          variant="secondary"
+          className="mt-5 w-full justify-center"
+        >
+          Find something similar
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="surface overflow-hidden">
+    <div id="tickets" className="surface overflow-hidden">
       <div className="border-b border-white/[0.06] px-5 py-4">
         <h2 className="flex items-center gap-2 font-heading text-subhead">
           <Ticket className="h-4 w-4 text-primary-400" />
@@ -139,7 +176,6 @@ export function TicketPicker({
                 <Stepper
                   value={quantities[tier.id] ?? 0}
                   max={tier.max}
-                  disabled={disabled}
                   label={tier.name}
                   onAdjust={(delta) => adjust(tier.id, delta, tier.max)}
                 />
@@ -150,9 +186,7 @@ export function TicketPicker({
       </div>
 
       <div className="border-t border-white/[0.06] bg-dark-950/50 px-5 py-4">
-        {disabled ? (
-          <p className="text-center text-sm text-dark-400">{disabledReason}</p>
-        ) : allSoldOut ? (
+        {allSoldOut ? (
           <p className="text-center text-sm text-dark-400">
             Every tier has sold out.
           </p>
@@ -196,18 +230,17 @@ export function TicketPicker({
 type StepperProps = {
   value: number;
   max: number;
-  disabled: boolean;
   label: string;
   onAdjust: (delta: number) => void;
 };
 
-function Stepper({ value, max, disabled, label, onAdjust }: StepperProps) {
+function Stepper({ value, max, label, onAdjust }: StepperProps) {
   return (
     <div className="flex items-center gap-3">
       <button
         type="button"
         aria-label={`One fewer ${label} ticket`}
-        disabled={disabled || value === 0}
+        disabled={value === 0}
         onClick={() => onAdjust(-1)}
         className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-dark-300 transition-colors hover:border-white/25 hover:text-white disabled:pointer-events-none disabled:opacity-35"
       >
@@ -233,7 +266,7 @@ function Stepper({ value, max, disabled, label, onAdjust }: StepperProps) {
       <button
         type="button"
         aria-label={`One more ${label} ticket`}
-        disabled={disabled || value >= max}
+        disabled={value >= max}
         onClick={() => onAdjust(1)}
         className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-dark-300 transition-colors hover:border-white/25 hover:text-white disabled:pointer-events-none disabled:opacity-35"
       >

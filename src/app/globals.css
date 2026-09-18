@@ -190,6 +190,22 @@
     display: none;
   }
 
+  /* The OpenStreetMap embed is a third-party document rendering light tiles,
+     and there is no dark style to ask it for. Inverting and rotating the hue
+     back is the standard way to get a dark map out of a light tileset: land
+     goes dark, labels go light, and the blues and greens land close to where
+     they started. The marker comes out pink, which is the one place an
+     accident agrees with the palette.
+
+     Applied to the iframe rather than inside it — the document is
+     cross-origin, so its own stylesheet is not ours to touch. Attribution
+     inverts with everything else and stays legible, which is what the licence
+     requires. */
+  .map-dark {
+    filter: invert(0.92) hue-rotate(180deg) brightness(0.95) contrast(0.88)
+      saturate(0.85);
+  }
+
   /* Perforated edge for the ticket stub — the notch that makes a rectangle
      read as a ticket. */
   .ticket-notch {

@@ -13,16 +13,19 @@ import type { ReactNode } from 'react';
 
 import { Badge } from '@/components/ui/Badge';
 import { EventCard } from '@/components/events/EventCard';
+import { EventRail, EventRailItem } from '@/components/events/EventRail';
 import { SaveButton } from '@/components/events/SaveButton';
+import { StickyBuyBar } from '@/components/events/StickyBuyBar';
 import { TicketPicker } from '@/components/events/TicketPicker';
 import { VenueMap } from '@/components/events/VenueMap';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { getEventBySlug, getRelatedEvents } from '@/lib/events';
+import { getEventBySlug, getRelatedEvents, remainingFor } from '@/lib/events';
 import {
   CATEGORY_LABELS,
   formatEventDateLong,
   formatEventWindow,
+  priceRangeLabel,
   relativeToNow,
 } from '@/lib/format';
 import {
@@ -81,6 +84,10 @@ export default async function EventPage({
 
   const past = event.endsAt < new Date();
   const cancelled = event.status === 'CANCELLED';
+  // One predicate for "you cannot buy this", so the panel, the save button and
+  // the sticky bar cannot end up disagreeing about whether it is on sale.
+  const unavailable = past || cancelled;
+  const soldOut = remainingFor(event.ticketTypes) <= 0;
 
   // Built as one value rather than checked inline in the JSX: narrowing a
   // property does not carry into the element below it, so the map would still
@@ -243,19 +250,26 @@ export default async function EventPage({
             <TicketPicker
               event={{ id: event.id, slug: event.slug, title: event.title }}
               ticketTypes={event.ticketTypes}
-              disabled={past || cancelled}
+              disabled={unavailable}
               disabledReason={
-                cancelled ? 'This event was cancelled.' : 'This event has finished.'
+                cancelled ? 'This event was cancelled' : 'This event has finished'
               }
+              browseHref={`/events?category=${event.category}`}
               signedIn={Boolean(user)}
             />
-            <div className="mt-3">
-              <SaveButton
-                eventId={event.id}
-                initialSaved={saved}
-                signedIn={Boolean(user)}
-              />
-            </div>
+            {/* Saving is a reminder to come back to something. There is
+                nothing to come back to once it has happened or been called
+                off, so the button goes rather than sitting there offering to
+                bookmark the past. */}
+            {!unavailable ? (
+              <div className="mt-3">
+                <SaveButton
+                  eventId={event.id}
+                  initialSaved={saved}
+                  signedIn={Boolean(user)}
+                />
+              </div>
+            ) : null}
           </aside>
         </div>
 
@@ -266,14 +280,23 @@ export default async function EventPage({
               More {CATEGORY_LABELS[event.category].toLowerCase()}, and more
               around {event.venue.county}
             </h2>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <EventRail columns={3}>
               {related.map((item) => (
-                <EventCard key={item.id} event={item} />
+                <EventRailItem key={item.id}>
+                  <EventCard event={item} />
+                </EventRailItem>
               ))}
-            </div>
+            </EventRail>
           </section>
         ) : null}
       </div>
+
+      {!unavailable ? (
+        <StickyBuyBar
+          priceLabel={priceRangeLabel(event.ticketTypes)}
+          soldOut={soldOut}
+        />
+      ) : null}
     </article>
   );
 }
